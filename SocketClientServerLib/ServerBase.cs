@@ -60,6 +60,7 @@ namespace SocketClientServerLib
 
         public bool Start(int port)
         {
+            if (State != ServerState.Stopped) return false;
             lock (_lock)
             {
                 if (State != ServerState.Stopped) return false;
@@ -143,6 +144,7 @@ namespace SocketClientServerLib
 
         public bool Stop()
         {
+            if (State != ServerState.Started) return false;
             lock (_lock)
             {
                 if (State != ServerState.Started) return false;

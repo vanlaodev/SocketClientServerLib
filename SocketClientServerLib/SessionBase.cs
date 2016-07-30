@@ -50,6 +50,7 @@ namespace SocketClientServerLib
 
         public bool Disconnect()
         {
+            if (State != SessionState.Connected) return false;
             lock (_lock)
             {
                 if (State != SessionState.Connected) return false;
@@ -69,6 +70,7 @@ namespace SocketClientServerLib
 
         protected bool AttachTcpClient(Func<TcpClient> getTcpClient)
         {
+            if (State != SessionState.Disconnected) return false;
             lock (_lock)
             {
                 if (State != SessionState.Disconnected) return false;
