@@ -9,7 +9,7 @@ namespace DemoServer
     {
         static void Main(string[] args)
         {
-            IDemoServer server = new global::DemoServer.DemoServer();
+            IDemoServer server = new DemoServer();
             server.InternalError += ServerOnInternalError;
             server.StateChanged += ServerOnStateChanged;
             server.ClientStateChanged += ServerOnClientStateChanged;
