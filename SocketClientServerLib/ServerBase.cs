@@ -19,6 +19,9 @@ namespace SocketClientServerLib
         public event Action<IServerBase, ServerState> StateChanged;
         public event Action<IServerBase, IServerSessionBase, SessionState> ClientStateChanged;
         public event Action<IServerBase, IServerSessionBase, Exception> ClientInternalError;
+        public event Action<IServerBase, ISessionBase, Packet> ClientDataSent;
+        public event Action<IServerBase, ISessionBase, Packet> ClientDataReceived;
+        public event Action<IServerBase, ISessionBase, bool> ClientSendDataReady;
 
         public List<IServerSessionBase> Clients
         {
@@ -71,7 +74,6 @@ namespace SocketClientServerLib
                     _tcpListener.Start();
                     _listenThread = new Thread(DoListen);
                     _listenThread.Start();
-                    State = ServerState.Started;
                     return true;
                 }
                 catch
@@ -84,6 +86,13 @@ namespace SocketClientServerLib
 
         private void DoListen()
         {
+            lock (_lock)
+            {
+                if (State == ServerState.Starting)
+                {
+                    State = ServerState.Started;
+                }
+            }
             while (State == ServerState.Started)
             {
                 try
@@ -94,6 +103,9 @@ namespace SocketClientServerLib
                         var client = CreateServerClient(tcpClient);
                         client.StateChanged += ClientOnStateChanged;
                         client.InternalError += ClientOnInternalError;
+                        client.DataReceived += ClientOnDataReceived;
+                        client.DataSent += ClientOnDataSent;
+                        client.SendDataReady += ClientOnSendDataReady;
                         client.AttachTcpClient(tcpClient);
                     }
                     catch (Exception ex)
@@ -104,13 +116,38 @@ namespace SocketClientServerLib
                 }
                 catch (Exception ex)
                 {
-                    ReportInternalError(ex);
                     if (State == ServerState.Started)
                     {
+                        ReportInternalError(ex);
                         Stop();
                     }
+                    // stopping or already stopped - not handle the error
                     return;
                 }
+            }
+        }
+
+        private void ClientOnSendDataReady(ISessionBase sessionBase, bool b)
+        {
+            if (ClientSendDataReady != null)
+            {
+                ClientSendDataReady(this, sessionBase, b);
+            }
+        }
+
+        private void ClientOnDataSent(ISessionBase sessionBase, Packet packet)
+        {
+            if (ClientDataSent != null)
+            {
+                ClientDataSent(this, sessionBase, packet);
+            }
+        }
+
+        private void ClientOnDataReceived(ISessionBase sessionBase, Packet packet)
+        {
+            if (ClientDataReceived != null)
+            {
+                ClientDataReceived(this, sessionBase, packet);
             }
         }
 
@@ -160,6 +197,10 @@ namespace SocketClientServerLib
                 try
                 {
                     _tcpListener.Stop();
+                    if (!Thread.CurrentThread.Equals(_listenThread))
+                    {
+                        _listenThread.Join();
+                    }
                     var clients = Clients;
                     foreach (var client in clients)
                     {

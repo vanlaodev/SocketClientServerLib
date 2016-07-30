@@ -12,9 +12,12 @@ namespace DemoClient
     {
         static void Main(string[] args)
         {
-            IDemoClient client = new DemoClient();
+            IDemoClient client = new DemoClient(4096);
             client.InternalError += ClientOnInternalError;
             client.StateChanged += ClientOnStateChanged;
+            client.DataReceived += ClientOnDataReceived;
+            client.SendDataReady += ClientOnSendDataReady;
+            client.DataSent += ClientOnDataSent;
             client.UseSsl = true;
             client.ServerCn = "DemoServer";
             client.ClientCertificate = new X509Certificate2("DemoClient.pfx", "green");
@@ -42,11 +45,35 @@ namespace DemoClient
                         case "exit":
                             quit = true;
                             break;
+                        default:
+                            client.SendData(new Packet()
+                            {
+                                Data = Encoding.UTF8.GetBytes(input)
+                            });
+                            break;
                     }
                 }
             } while (!quit);
 
             client.Dispose();
+        }
+
+        private static void ClientOnSendDataReady(ISessionBase sessionBase, bool b)
+        {
+            if (b)
+            {
+                Console.WriteLine("Send data ready");
+            }
+        }
+
+        private static void ClientOnDataSent(ISessionBase sessionBase, Packet packet)
+        {
+            Console.WriteLine("Data sent: " + Encoding.UTF8.GetString(packet.Data));
+        }
+
+        private static void ClientOnDataReceived(ISessionBase sessionBase, Packet packet)
+        {
+            Console.WriteLine("Data received: " + Encoding.UTF8.GetString(packet.Data));
         }
 
         private static void Disconnect(IDemoClient client)

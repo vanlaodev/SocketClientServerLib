@@ -17,6 +17,9 @@ namespace DmoServer
             server.StateChanged += ServerOnStateChanged;
             server.ClientStateChanged += ServerOnClientStateChanged;
             server.ClientInternalError += ServerOnClientInternalError;
+            server.ClientDataReceived += ServerOnClientDataReceived;
+            server.ClientDataSent += ServerOnClientDataSent;
+            server.ClientSendDataReady += ServerOnClientSendDataReady;
             server.UseSsl = true;
             server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
             StartServer(server);
@@ -46,11 +49,32 @@ namespace DmoServer
                         case "exit":
                             quit = true;
                             break;
+                        default:
+                            server.Clients.ForEach(client => client.SendData(new Packet() { Data = Encoding.UTF8.GetBytes(input) }));
+                            break;
                     }
                 }
             } while (!quit);
 
             server.Dispose();
+        }
+
+        private static void ServerOnClientSendDataReady(IServerBase serverBase, ISessionBase sessionBase, bool arg3)
+        {
+            if (arg3)
+            {
+                Console.WriteLine("Client send data ready");
+            }
+        }
+
+        private static void ServerOnClientDataSent(IServerBase serverBase, ISessionBase sessionBase, Packet arg3)
+        {
+            Console.WriteLine("Client data sent: " + Encoding.UTF8.GetString(arg3.Data));
+        }
+
+        private static void ServerOnClientDataReceived(IServerBase serverBase, ISessionBase sessionBase, Packet arg3)
+        {
+            Console.WriteLine("Client data received: " + Encoding.UTF8.GetString(arg3.Data));
         }
 
         private static void ServerOnClientInternalError(IServerBase serverBase, IServerSessionBase serverSessionBase, Exception arg3)

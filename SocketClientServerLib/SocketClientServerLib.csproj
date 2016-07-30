@@ -48,7 +48,10 @@
     <Compile Include="ISslClientSessionBase.cs" />
     <Compile Include="ISslServerBase.cs" />
     <Compile Include="ISslServerSessionBase.cs" />
+    <Compile Include="Packet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReceiveDataWorker.cs" />
+    <Compile Include="SendDataWorker.cs" />
     <Compile Include="ServerBase.cs" />
     <Compile Include="ServerSessionBase.cs" />
     <Compile Include="ServerState.cs" />

@@ -46,6 +46,10 @@ namespace SocketClientServerLib
 
         public string ClientCn { get; private set; }
 
+        protected SslServerSessionBase(int receiveBufferSize) : base(receiveBufferSize)
+        {
+        }
+
         protected override Stream GetStream(TcpClient tcpClient)
         {
             var stream = tcpClient.GetStream();

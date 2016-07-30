@@ -7,7 +7,7 @@ namespace DmoServer
     {
         protected override ISslServerSessionBase CreateSslServerClient(TcpClient tcpClient)
         {
-            return new DemoServerClient();
+            return new DemoServerClient(4096);
         }
     }
 }

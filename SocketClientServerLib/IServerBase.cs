@@ -9,6 +9,9 @@ namespace SocketClientServerLib
         event Action<IServerBase, ServerState> StateChanged;
         event Action<IServerBase, IServerSessionBase, SessionState> ClientStateChanged;
         event Action<IServerBase, IServerSessionBase, Exception> ClientInternalError;
+        event Action<IServerBase, ISessionBase, Packet> ClientDataSent;
+        event Action<IServerBase, ISessionBase, Packet> ClientDataReceived;
+        event Action<IServerBase, ISessionBase, bool> ClientSendDataReady;
 
         List<IServerSessionBase> Clients { get; }
 
