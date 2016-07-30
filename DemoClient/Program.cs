@@ -20,6 +20,7 @@ namespace DemoClient
             client.SendDataReady += ClientOnSendDataReady;
             client.DataSent += ClientOnDataSent;
             client.UseSsl = true;
+            client.AutoReconnect = true;
             client.ServerCn = "DemoServer";
             client.ClientCertificate = new X509Certificate2("DemoClient.pfx", "green");
             Connect(client);

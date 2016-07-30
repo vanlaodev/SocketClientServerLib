@@ -54,9 +54,9 @@ namespace SocketClientServerLib
             }
             catch (Exception ex)
             {
-                ReportInternalError(ex);
                 if (AutoReconnect)
                 {
+                    ReportInternalError(ex);
                     StartReconnect();
                     return false;
                 }
