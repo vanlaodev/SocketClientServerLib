@@ -1,6 +1,6 @@
 ﻿using SocketClientServerLib;
 
-namespace DmoServer
+namespace DemoServer
 {
     public interface IDemoServerClient : ISslServerSessionBase
     {

@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using SocketClientServerLib;
 
-namespace DmoServer
+namespace DemoServer
 {
     public class DemoServer : SslServerBase, IDemoServer
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{5ACDD171-D882-40BA-A09B-34073DE69D78}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DmoServer</RootNamespace>
-    <AssemblyName>DmoServer</AssemblyName>
+    <RootNamespace>DemoServer</RootNamespace>
+    <AssemblyName>DemoServer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketClientServerLib", "SocketClientServerLib\SocketClientServerLib.csproj", "{12733501-AA74-44B1-8BB1-4063DF0A4944}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DmoServer", "DmoServer\DmoServer.csproj", "{5ACDD171-D882-40BA-A09B-34073DE69D78}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoServer", "DemoServer\DemoServer.csproj", "{5ACDD171-D882-40BA-A09B-34073DE69D78}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoClient", "DemoClient\DemoClient.csproj", "{4F38174B-276D-4AF1-B5C0-57C0B68E64F8}"
 EndProject

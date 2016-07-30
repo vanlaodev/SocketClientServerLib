@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 using SocketClientServerLib;
 
-namespace DmoServer
+namespace DemoServer
 {
     class Program
     {
         static void Main(string[] args)
         {
-            IDemoServer server = new DemoServer();
+            IDemoServer server = new global::DemoServer.DemoServer();
             server.InternalError += ServerOnInternalError;
             server.StateChanged += ServerOnStateChanged;
             server.ClientStateChanged += ServerOnClientStateChanged;
