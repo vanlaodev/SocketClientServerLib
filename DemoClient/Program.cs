@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using SocketClientServerLib;
@@ -14,6 +15,9 @@ namespace DemoClient
             IDemoClient client = new DemoClient();
             client.InternalError += ClientOnInternalError;
             client.StateChanged += ClientOnStateChanged;
+            client.UseSsl = true;
+            client.ServerCn = "DemoServer";
+            client.ClientCertificate = new X509Certificate2("DemoClient.pfx", "green");
             Connect(client);
 
             var quit = false;
@@ -56,7 +60,7 @@ namespace DemoClient
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex);
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
 
@@ -71,7 +75,7 @@ namespace DemoClient
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex);
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
 

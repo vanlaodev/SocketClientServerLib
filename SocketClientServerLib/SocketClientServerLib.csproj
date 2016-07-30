@@ -45,12 +45,18 @@
     <Compile Include="IServerBase.cs" />
     <Compile Include="IServerSessionBase.cs" />
     <Compile Include="ISessionBase.cs" />
+    <Compile Include="ISslClientSessionBase.cs" />
+    <Compile Include="ISslServerBase.cs" />
+    <Compile Include="ISslServerSessionBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerBase.cs" />
     <Compile Include="ServerSessionBase.cs" />
     <Compile Include="ServerState.cs" />
     <Compile Include="SessionBase.cs" />
     <Compile Include="SessionState.cs" />
+    <Compile Include="SslClientSessionBase.cs" />
+    <Compile Include="SslServerBase.cs" />
+    <Compile Include="SslServerSessionBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

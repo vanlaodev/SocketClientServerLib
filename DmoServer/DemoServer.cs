@@ -3,9 +3,9 @@ using SocketClientServerLib;
 
 namespace DmoServer
 {
-    public class DemoServer : ServerBase, IDemoServer
+    public class DemoServer : SslServerBase, IDemoServer
     {
-        protected override IServerSessionBase CreateServerClient(TcpClient tcpClient)
+        protected override ISslServerSessionBase CreateSslServerClient(TcpClient tcpClient)
         {
             return new DemoServerClient();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using SocketClientServerLib;
@@ -16,6 +17,8 @@ namespace DmoServer
             server.StateChanged += ServerOnStateChanged;
             server.ClientStateChanged += ServerOnClientStateChanged;
             server.ClientInternalError += ServerOnClientInternalError;
+            server.UseSsl = true;
+            server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
             StartServer(server);
 
             var quit = false;

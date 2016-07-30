@@ -89,10 +89,18 @@ namespace SocketClientServerLib
                 try
                 {
                     var tcpClient = _tcpListener.AcceptTcpClient();
-                    var client = CreateServerClient(tcpClient);
-                    client.StateChanged += ClientOnStateChanged;
-                    client.InternalError += ClientOnInternalError;
-                    client.AttachTcpClient(tcpClient);
+                    try
+                    {
+                        var client = CreateServerClient(tcpClient);
+                        client.StateChanged += ClientOnStateChanged;
+                        client.InternalError += ClientOnInternalError;
+                        client.AttachTcpClient(tcpClient);
+                    }
+                    catch (Exception ex)
+                    {
+                        ReportInternalError(ex);
+                        tcpClient.Close();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -101,7 +109,7 @@ namespace SocketClientServerLib
                     {
                         Stop();
                     }
-                    break;
+                    return;
                 }
             }
         }

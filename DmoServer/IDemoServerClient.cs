@@ -2,7 +2,7 @@
 
 namespace DmoServer
 {
-    public interface IDemoServerClient : IServerSessionBase
+    public interface IDemoServerClient : ISslServerSessionBase
     {
 
     }

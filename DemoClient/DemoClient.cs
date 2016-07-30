@@ -2,7 +2,7 @@
 
 namespace DemoClient
 {
-    public class DemoClient : ClientSessionBase, IDemoClient
+    public class DemoClient : SslClientSessionBase, IDemoClient
     {
         
     }

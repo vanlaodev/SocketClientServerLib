@@ -2,7 +2,7 @@
 
 namespace DemoClient
 {
-    public interface IDemoClient : IClientSessionBase
+    public interface IDemoClient : ISslClientSessionBase
     {
 
     }

@@ -2,7 +2,7 @@
 
 namespace DmoServer
 {
-    public class DemoServerClient : ServerSessionBase, IDemoServerClient
+    public class DemoServerClient : SslServerSessionBase, IDemoServerClient
     {
         
     }
