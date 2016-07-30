@@ -36,9 +36,16 @@
   <ItemGroup>
     <Compile Include="ClientReconnectWorker.cs" />
     <Compile Include="ClientSessionBase.cs" />
+    <Compile Include="CompressionType.cs" />
+    <Compile Include="CompressionUtil.cs" />
+    <Compile Include="ConversionUtil.cs" />
+    <Compile Include="DefaultIncomingDataProcessor.cs" />
+    <Compile Include="DefaultOutgoingDataProcessor.cs" />
     <Compile Include="HeartbeatPacket.cs" />
     <Compile Include="HeartbeatWorker.cs" />
     <Compile Include="IClientSessionBase.cs" />
+    <Compile Include="IIncomingDataProcessor.cs" />
+    <Compile Include="IOutgoingDataProcessor.cs" />
     <Compile Include="IServerBase.cs" />
     <Compile Include="IServerSessionBase.cs" />
     <Compile Include="ISessionBase.cs" />

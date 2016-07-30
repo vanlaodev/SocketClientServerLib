@@ -2,6 +2,6 @@
 {
     public class Packet
     {
-        public byte[] Data { get; set; }
+        public virtual byte[] Data { get; set; }
     }
 }

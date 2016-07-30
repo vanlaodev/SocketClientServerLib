@@ -7,7 +7,7 @@ namespace DemoServer
     {
         protected override ISslServerSessionBase CreateSslServerClient(TcpClient tcpClient)
         {
-            return new DemoServerClient(4096);
+            return new DemoServerClient(new DefaultIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DefaultOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip), 4096);
         }
     }
 }

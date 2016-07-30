@@ -12,6 +12,12 @@ namespace SocketClientServerLib
         private readonly object _lock = new object();
         private Thread _workerThread;
         private readonly Queue<Packet> _sendQueue = new Queue<Packet>();
+        private readonly IOutgoingDataProcessor _outgoingDataProcessor;
+
+        public SendDataWorker(IOutgoingDataProcessor outgoingDataProcessor)
+        {
+            _outgoingDataProcessor = outgoingDataProcessor;
+        }
 
         public event Action<SendDataWorker, SendDataWorkerState> StateChanged;
         public event Action<SendDataWorker, Exception> Error;
@@ -101,7 +107,8 @@ namespace SocketClientServerLib
                 }
                 try
                 {
-                    stream.Write(dataToBeSent.Data, 0, dataToBeSent.Data.Length);
+                    var dataBytes = _outgoingDataProcessor.Process(dataToBeSent);
+                    stream.Write(dataBytes, 0, dataBytes.Length);
                     if (Sent != null)
                     {
                         Sent(this, dataToBeSent);
@@ -149,6 +156,7 @@ namespace SocketClientServerLib
             try
             {
                 Stop();
+                _outgoingDataProcessor.Dispose();
             }
             catch
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace SocketClientServerLib
@@ -10,6 +11,8 @@ namespace SocketClientServerLib
         private volatile ReceiveDataWorkerState _state = ReceiveDataWorkerState.Stopped;
         private readonly object _lock = new object();
         private Thread _workerThread;
+        private readonly IIncomingDataProcessor _incomingDataProcessor;
+
         public event Action<ReceiveDataWorker, ReceiveDataWorkerState> StateChanged;
         public event Action<ReceiveDataWorker, Exception> Error;
         public event Action<ReceiveDataWorker, Packet> Received;
@@ -35,8 +38,9 @@ namespace SocketClientServerLib
             }
         }
 
-        public ReceiveDataWorker(int bufferSize)
+        public ReceiveDataWorker(int bufferSize, IIncomingDataProcessor incomingDataProcessor)
         {
+            _incomingDataProcessor = incomingDataProcessor;
             _buffer = new byte[bufferSize];
         }
 
@@ -62,6 +66,7 @@ namespace SocketClientServerLib
                 {
                     State = ReceiveDataWorkerState.Started;
                     _cts = new CancellationTokenSource();
+                    _incomingDataProcessor.Reset();
                 }
             }
             var stream = (Stream)obj;
@@ -74,14 +79,13 @@ namespace SocketClientServerLib
                     {
                         throw new EndOfStreamException("Remote end has closed the connection.");
                     }
-                    if (Received != null)
+                    var packets = _incomingDataProcessor.Process(_buffer, 0, lenRead);
+                    if (Received != null && packets.Any())
                     {
-                        var data = new byte[lenRead];
-                        Array.Copy(_buffer, data, lenRead);
-                        Received(this, new Packet()
+                        foreach (var packet in packets)
                         {
-                            Data = data
-                        });
+                            Received(this, packet);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -125,6 +129,7 @@ namespace SocketClientServerLib
             try
             {
                 Stop();
+                _incomingDataProcessor.Dispose();
             }
             catch
             {

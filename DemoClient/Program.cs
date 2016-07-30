@@ -11,7 +11,7 @@ namespace DemoClient
     {
         static void Main(string[] args)
         {
-            IDemoClient client = new DemoClient(4096);
+            IDemoClient client = new DemoClient(new DefaultIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DefaultOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip), 4096);
             client.ReconnectInterval = 5000;
             client.HeartbeatInterval = 5000;
             client.InternalError += ClientOnInternalError;
@@ -21,6 +21,7 @@ namespace DemoClient
             client.DataSent += ClientOnDataSent;
             client.UseSsl = true;
             client.AutoReconnect = true;
+//            client.SendHeartbeat = false;
             client.ServerCn = "DemoServer";
             client.ClientCertificate = new X509Certificate2("DemoClient.pfx", "green");
             Connect(client);
@@ -70,11 +71,16 @@ namespace DemoClient
 
         private static void ClientOnDataSent(ISessionBase sessionBase, Packet packet)
         {
-//            Console.WriteLine("Data sent: " + Encoding.UTF8.GetString(packet.Data));
+            //            Console.WriteLine("Data sent: " + Encoding.UTF8.GetString(packet.Data));
         }
 
         private static void ClientOnDataReceived(ISessionBase sessionBase, Packet packet)
         {
+            if (packet is HeartbeatPacket)
+            {
+                Console.WriteLine("Heartbeat.");
+                return;
+            }
             Console.WriteLine("Data received: " + Encoding.UTF8.GetString(packet.Data));
         }
 

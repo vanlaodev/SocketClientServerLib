@@ -74,9 +74,9 @@ namespace SocketClientServerLib
             }
         }
 
-        protected SessionBase(int receiveBufferSize)
+        protected SessionBase(IIncomingDataProcessor incomingDataProcessor, IOutgoingDataProcessor outgoingDataProcessor, int receiveBufferSize)
         {
-            _sendDataWorker = new SendDataWorker();
+            _sendDataWorker = new SendDataWorker(outgoingDataProcessor);
             _sendDataWorker.Sent += SendDataWorkerOnSent;
             _sendDataWorker.Error += SendDataWorkerOnError;
             _sendDataWorker.StateChanged += SendDataWorkerOnStateChanged;
@@ -84,7 +84,7 @@ namespace SocketClientServerLib
             _heartbeatWorker = new HeartbeatWorker(_sendDataWorker);
             _heartbeatWorker.StateChanged += HeartbeatWorkerOnStateChanged;
 
-            _receiveDataWorker = new ReceiveDataWorker(receiveBufferSize);
+            _receiveDataWorker = new ReceiveDataWorker(receiveBufferSize, incomingDataProcessor);
             _receiveDataWorker.Received += ReceiveDataWorkerOnReceived;
             _receiveDataWorker.Error += ReceiveDataWorkerOnError;
             _receiveDataWorker.StateChanged += ReceiveDataWorkerOnStateChanged;
@@ -102,6 +102,7 @@ namespace SocketClientServerLib
 
         private void ReceiveDataWorkerOnError(ReceiveDataWorker receiveDataWorker, Exception exception)
         {
+            ReportInternalError(exception);
             Disconnect();
         }
 
@@ -132,6 +133,7 @@ namespace SocketClientServerLib
 
         private void SendDataWorkerOnError(SendDataWorker sendDataWorker, Exception exception)
         {
+            ReportInternalError(exception);
             Disconnect();
         }
 

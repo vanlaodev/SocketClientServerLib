@@ -19,6 +19,7 @@ namespace DemoServer
             server.ClientSendDataReady += ServerOnClientSendDataReady;
             server.UseSsl = true;
             server.HeartbeatInterval = 5000;
+//            server.SendHeartbeat = false;
             server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
             StartServer(server);
 
@@ -67,11 +68,16 @@ namespace DemoServer
 
         private static void ServerOnClientDataSent(IServerBase serverBase, ISessionBase sessionBase, Packet arg3)
         {
-//            Console.WriteLine("Client data sent: " + Encoding.UTF8.GetString(arg3.Data));
+            //            Console.WriteLine("Client data sent: " + Encoding.UTF8.GetString(arg3.Data));
         }
 
         private static void ServerOnClientDataReceived(IServerBase serverBase, ISessionBase sessionBase, Packet arg3)
         {
+            if (arg3 is HeartbeatPacket)
+            {
+                Console.WriteLine("Heartbeat.");
+                return;
+            }
             Console.WriteLine("Client data received: " + Encoding.UTF8.GetString(arg3.Data));
         }
 

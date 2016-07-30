@@ -13,7 +13,7 @@ namespace SocketClientServerLib
         public bool AutoReconnect { get; set; }
         public int ReconnectInterval { get; set; }
 
-        protected ClientSessionBase(int receiveBufferSize) : base(receiveBufferSize)
+        protected ClientSessionBase(IIncomingDataProcessor incomingDataProcessor, IOutgoingDataProcessor outgoingDataProcessor, int receiveBufferSize) : base(incomingDataProcessor, outgoingDataProcessor, receiveBufferSize)
         {
             _clientReconnectWorker = new ClientReconnectWorker();
             _clientReconnectWorker.StateChanged += ClientReconnectWorkerOnStateChanged;
