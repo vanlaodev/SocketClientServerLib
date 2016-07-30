@@ -46,7 +46,7 @@ namespace SocketClientServerLib
 
         public string ClientCn { get; private set; }
 
-        protected SslServerSessionBase(int receiveBufferSize) : base(receiveBufferSize)
+        protected SslServerSessionBase(int receiveBufferSize, int heartbeatInterval) : base(receiveBufferSize, heartbeatInterval)
         {
         }
 

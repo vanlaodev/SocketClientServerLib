@@ -2,7 +2,7 @@
 {
     public abstract class ServerSessionBase : SessionBase, IServerSessionBase
     {
-        protected ServerSessionBase(int receiveBufferSize) : base(receiveBufferSize)
+        protected ServerSessionBase(int receiveBufferSize, int heartbeatInterval) : base(receiveBufferSize, heartbeatInterval)
         {
         }
     }

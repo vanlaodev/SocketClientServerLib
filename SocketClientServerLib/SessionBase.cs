@@ -13,6 +13,7 @@ namespace SocketClientServerLib
         private readonly object _stateLock = new object();
         private readonly SendDataWorker _sendDataWorker;
         private readonly ReceiveDataWorker _receiveDataWorker;
+        private readonly HeartbeatWorker _heartbeatWorker;
 
         public event Action<ISessionBase, SessionState> StateChanged;
 
@@ -48,17 +49,25 @@ namespace SocketClientServerLib
             }
         }
 
-        protected SessionBase(int receiveBufferSize)
+        protected SessionBase(int receiveBufferSize, int heartbeatInterval)
         {
             _sendDataWorker = new SendDataWorker();
             _sendDataWorker.Sent += SendDataWorkerOnSent;
             _sendDataWorker.Error += SendDataWorkerOnError;
             _sendDataWorker.StateChanged += SendDataWorkerOnStateChanged;
 
+            _heartbeatWorker = new HeartbeatWorker(_sendDataWorker, heartbeatInterval);
+            _heartbeatWorker.StateChanged += HeartbeatWorkerOnStateChanged;
+
             _receiveDataWorker = new ReceiveDataWorker(receiveBufferSize);
             _receiveDataWorker.Received += ReceiveDataWorkerOnReceived;
             _receiveDataWorker.Error += ReceiveDataWorkerOnError;
             _receiveDataWorker.StateChanged += ReceiveDataWorkerOnStateChanged;
+        }
+
+        private void HeartbeatWorkerOnStateChanged(HeartbeatWorker heartbeatWorker, HeartbeatWorker.HeartbeatWorkerState heartbeatWorkerState)
+        {
+
         }
 
         private void ReceiveDataWorkerOnStateChanged(ReceiveDataWorker receiveDataWorker, ReceiveDataWorker.ReceiveDataWorkerState receiveDataWorkerState)
@@ -81,9 +90,18 @@ namespace SocketClientServerLib
 
         private void SendDataWorkerOnStateChanged(SendDataWorker sendDataWorker, SendDataWorker.SendDataWorkerState sendDataWorkerState)
         {
+            var ready = sendDataWorkerState == SendDataWorker.SendDataWorkerState.Started;
+            if (ready)
+            {
+                _heartbeatWorker.Start();
+            }
+            else
+            {
+                _heartbeatWorker.Stop();
+            }
             if (SendDataReady != null)
             {
-                SendDataReady(this, sendDataWorkerState == SendDataWorker.SendDataWorkerState.Started);
+                SendDataReady(this, ready);
             }
         }
 

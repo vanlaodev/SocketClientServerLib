@@ -4,7 +4,7 @@ namespace SocketClientServerLib
 {
     public abstract class ClientSessionBase : SessionBase, IClientSessionBase
     {
-        protected ClientSessionBase(int receiveBufferSize) : base(receiveBufferSize)
+        protected ClientSessionBase(int receiveBufferSize, int heartbeatInterval) : base(receiveBufferSize, heartbeatInterval)
         {
         }
 

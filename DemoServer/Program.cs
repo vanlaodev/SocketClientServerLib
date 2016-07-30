@@ -66,7 +66,7 @@ namespace DemoServer
 
         private static void ServerOnClientDataSent(IServerBase serverBase, ISessionBase sessionBase, Packet arg3)
         {
-            Console.WriteLine("Client data sent: " + Encoding.UTF8.GetString(arg3.Data));
+//            Console.WriteLine("Client data sent: " + Encoding.UTF8.GetString(arg3.Data));
         }
 
         private static void ServerOnClientDataReceived(IServerBase serverBase, ISessionBase sessionBase, Packet arg3)

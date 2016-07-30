@@ -35,6 +35,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientSessionBase.cs" />
+    <Compile Include="HeartbeatPacket.cs" />
+    <Compile Include="HeartbeatWorker.cs" />
     <Compile Include="IClientSessionBase.cs" />
     <Compile Include="IServerBase.cs" />
     <Compile Include="IServerSessionBase.cs" />

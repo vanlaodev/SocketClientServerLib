@@ -11,7 +11,7 @@ namespace DemoClient
     {
         static void Main(string[] args)
         {
-            IDemoClient client = new DemoClient(4096);
+            IDemoClient client = new DemoClient(4096, 1000);
             client.InternalError += ClientOnInternalError;
             client.StateChanged += ClientOnStateChanged;
             client.DataReceived += ClientOnDataReceived;
@@ -67,7 +67,7 @@ namespace DemoClient
 
         private static void ClientOnDataSent(ISessionBase sessionBase, Packet packet)
         {
-            Console.WriteLine("Data sent: " + Encoding.UTF8.GetString(packet.Data));
+//            Console.WriteLine("Data sent: " + Encoding.UTF8.GetString(packet.Data));
         }
 
         private static void ClientOnDataReceived(ISessionBase sessionBase, Packet packet)
