@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 
 namespace SocketClientServerLib
@@ -14,6 +15,8 @@ namespace SocketClientServerLib
         private readonly SendDataWorker _sendDataWorker;
         private readonly ReceiveDataWorker _receiveDataWorker;
         private readonly HeartbeatWorker _heartbeatWorker;
+        private bool _sendHeartbeat = true;
+        private int _heartbeatInterval = 60000; // default 60s
 
         public event Action<ISessionBase, SessionState> StateChanged;
 
@@ -21,6 +24,28 @@ namespace SocketClientServerLib
         public event Action<ISessionBase, Packet> DataSent;
         public event Action<ISessionBase, Packet> DataReceived;
         public event Action<ISessionBase, bool> SendDataReady;
+
+        public bool SendHeartbeat
+        {
+            get { return _sendHeartbeat; }
+            set
+            {
+                if (State != SessionState.Disconnected && State != SessionState.Disconnecting) throw new InvalidOperationException("Invalid session state.");
+                _sendHeartbeat = value;
+            }
+        }
+
+        public int HeartbeatInterval
+        {
+            get { return _heartbeatInterval; }
+            set
+            {
+                if (State != SessionState.Disconnected && State != SessionState.Disconnecting) throw new InvalidOperationException("Invalid session state.");
+                _heartbeatInterval = value;
+            }
+        }
+
+        public IPEndPoint EndPoint { get; private set; }
 
         public SessionState State
         {
@@ -49,14 +74,14 @@ namespace SocketClientServerLib
             }
         }
 
-        protected SessionBase(int receiveBufferSize, int heartbeatInterval)
+        protected SessionBase(int receiveBufferSize)
         {
             _sendDataWorker = new SendDataWorker();
             _sendDataWorker.Sent += SendDataWorkerOnSent;
             _sendDataWorker.Error += SendDataWorkerOnError;
             _sendDataWorker.StateChanged += SendDataWorkerOnStateChanged;
 
-            _heartbeatWorker = new HeartbeatWorker(_sendDataWorker, heartbeatInterval);
+            _heartbeatWorker = new HeartbeatWorker(_sendDataWorker);
             _heartbeatWorker.StateChanged += HeartbeatWorkerOnStateChanged;
 
             _receiveDataWorker = new ReceiveDataWorker(receiveBufferSize);
@@ -91,9 +116,9 @@ namespace SocketClientServerLib
         private void SendDataWorkerOnStateChanged(SendDataWorker sendDataWorker, SendDataWorker.SendDataWorkerState sendDataWorkerState)
         {
             var ready = sendDataWorkerState == SendDataWorker.SendDataWorkerState.Started;
-            if (ready)
+            if (ready && SendHeartbeat)
             {
-                _heartbeatWorker.Start();
+                _heartbeatWorker.Start(HeartbeatInterval);
             }
             else
             {
@@ -164,6 +189,7 @@ namespace SocketClientServerLib
                 try
                 {
                     _tcpClient = getTcpClient();
+                    EndPoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
                     _stream = GetStream(_tcpClient);
                     State = SessionState.Connected;
                     _sendDataWorker.Start(_stream);
@@ -191,11 +217,12 @@ namespace SocketClientServerLib
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             try
             {
                 Disconnect();
+                _heartbeatWorker.Dispose();
                 _sendDataWorker.Dispose();
                 _receiveDataWorker.Dispose();
             }

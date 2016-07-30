@@ -11,7 +11,9 @@ namespace DemoClient
     {
         static void Main(string[] args)
         {
-            IDemoClient client = new DemoClient(4096, 1000);
+            IDemoClient client = new DemoClient(4096);
+            client.ReconnectInterval = 5000;
+            client.HeartbeatInterval = 5000;
             client.InternalError += ClientOnInternalError;
             client.StateChanged += ClientOnStateChanged;
             client.DataReceived += ClientOnDataReceived;

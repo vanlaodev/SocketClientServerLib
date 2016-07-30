@@ -18,6 +18,7 @@ namespace DemoServer
             server.ClientDataSent += ServerOnClientDataSent;
             server.ClientSendDataReady += ServerOnClientSendDataReady;
             server.UseSsl = true;
+            server.HeartbeatInterval = 5000;
             server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
             StartServer(server);
 

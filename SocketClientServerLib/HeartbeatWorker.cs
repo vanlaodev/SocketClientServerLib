@@ -10,7 +10,6 @@ namespace SocketClientServerLib
         private readonly object _lock = new object();
         private Thread _workerThread;
         public event Action<HeartbeatWorker, HeartbeatWorkerState> StateChanged;
-        private readonly int _heartbeatInterval;
 
         public HeartbeatWorkerState State
         {
@@ -31,13 +30,12 @@ namespace SocketClientServerLib
             }
         }
 
-        public HeartbeatWorker(SendDataWorker sendDataWorker, int heartbeatInterval)
+        public HeartbeatWorker(SendDataWorker sendDataWorker)
         {
             _sendDataWorker = sendDataWorker;
-            _heartbeatInterval = heartbeatInterval;
         }
 
-        public bool Start()
+        public bool Start(int heartbeatInterval)
         {
             if (State != HeartbeatWorkerState.Stopped) return false;
             lock (_lock)
@@ -45,12 +43,12 @@ namespace SocketClientServerLib
                 if (State != HeartbeatWorkerState.Stopped) return false;
                 State = HeartbeatWorkerState.Starting;
                 _workerThread = new Thread(DoHeartbeat);
-                _workerThread.Start();
+                _workerThread.Start(heartbeatInterval);
                 return true;
             }
         }
 
-        private void DoHeartbeat()
+        private void DoHeartbeat(object obj)
         {
             lock (_lock)
             {
@@ -59,6 +57,7 @@ namespace SocketClientServerLib
                     State = HeartbeatWorkerState.Started;
                 }
             }
+            var heartbeatInterval = (int)obj;
             while (State == HeartbeatWorkerState.Started)
             {
                 _sendDataWorker.SendData(new HeartbeatPacket());
@@ -66,7 +65,7 @@ namespace SocketClientServerLib
                 {
                     if (State == HeartbeatWorkerState.Started)
                     {
-                        Monitor.Wait(_workerThread, _heartbeatInterval);
+                        Monitor.Wait(_workerThread, heartbeatInterval);
                     }
                 }
             }

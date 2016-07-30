@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace SocketClientServerLib
@@ -11,7 +12,13 @@ namespace SocketClientServerLib
         event Action<ISessionBase, Packet> DataReceived;
         event Action<ISessionBase, bool> SendDataReady;
 
+        IPEndPoint EndPoint { get; }
+
         SessionState State { get; }
+
+        bool SendHeartbeat { get; set; }
+
+        int HeartbeatInterval { get; set; }
 
         bool AttachTcpClient(TcpClient tcpClient);
 

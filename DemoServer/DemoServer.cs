@@ -7,7 +7,7 @@ namespace DemoServer
     {
         protected override ISslServerSessionBase CreateSslServerClient(TcpClient tcpClient)
         {
-            return new DemoServerClient(4096, 1000);
+            return new DemoServerClient(4096);
         }
     }
 }

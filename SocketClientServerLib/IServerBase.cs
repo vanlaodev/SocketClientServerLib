@@ -13,6 +13,10 @@ namespace SocketClientServerLib
         event Action<IServerBase, ISessionBase, Packet> ClientDataReceived;
         event Action<IServerBase, ISessionBase, bool> ClientSendDataReady;
 
+        bool SendHeartbeat { get; set; }
+
+        int HeartbeatInterval { get; set; }
+
         List<IServerSessionBase> Clients { get; }
 
         ServerState State { get; }

@@ -15,7 +15,7 @@ namespace SocketClientServerLib
         private int _authenticateTimeout = 30000; // default 30s
         private X509Certificate2 _clientCertificate;
 
-        protected SslClientSessionBase(int receiveBufferSize, int heartbeatInterval) : base(receiveBufferSize, heartbeatInterval)
+        protected SslClientSessionBase(int receiveBufferSize) : base(receiveBufferSize)
         {
         }
 

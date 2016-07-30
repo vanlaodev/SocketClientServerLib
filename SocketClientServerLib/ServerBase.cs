@@ -14,6 +14,8 @@ namespace SocketClientServerLib
         private Thread _listenThread;
         private volatile ServerState _state = ServerState.Stopped;
         private TcpListener _tcpListener;
+        private bool _sendHeartbeat = true;
+        private int _heartbeatInterval = 60000; // default 60s
 
         public event Action<IServerBase, Exception> InternalError;
         public event Action<IServerBase, ServerState> StateChanged;
@@ -22,6 +24,26 @@ namespace SocketClientServerLib
         public event Action<IServerBase, ISessionBase, Packet> ClientDataSent;
         public event Action<IServerBase, ISessionBase, Packet> ClientDataReceived;
         public event Action<IServerBase, ISessionBase, bool> ClientSendDataReady;
+
+        public bool SendHeartbeat
+        {
+            get { return _sendHeartbeat; }
+            set
+            {
+                if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
+                _sendHeartbeat = value;
+            }
+        }
+
+        public int HeartbeatInterval
+        {
+            get { return _heartbeatInterval; }
+            set
+            {
+                if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
+                _heartbeatInterval = value;
+            }
+        }
 
         public List<IServerSessionBase> Clients
         {
@@ -105,6 +127,8 @@ namespace SocketClientServerLib
                         client.InternalError += ClientOnInternalError;
                         client.DataReceived += ClientOnDataReceived;
                         client.DataSent += ClientOnDataSent;
+                        client.SendHeartbeat = SendHeartbeat;
+                        client.HeartbeatInterval = HeartbeatInterval;
                         client.SendDataReady += ClientOnSendDataReady;
                         client.AttachTcpClient(tcpClient);
                     }
