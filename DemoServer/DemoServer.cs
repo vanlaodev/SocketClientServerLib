@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using DemoCommon;
 using SocketClientServerLib;
 
 namespace DemoServer
@@ -7,7 +8,7 @@ namespace DemoServer
     {
         protected override ISslServerSessionBase CreateSslServerClient(TcpClient tcpClient)
         {
-            return new DemoServerClient(new DefaultIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DefaultOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip), 4096);
+            return new DemoServerClient(new DemoIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DemoOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip), 4096);
         }
     }
 }

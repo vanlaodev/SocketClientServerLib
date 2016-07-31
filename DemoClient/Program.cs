@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using DemoCommon;
 using SocketClientServerLib;
 
 namespace DemoClient
@@ -11,7 +12,7 @@ namespace DemoClient
     {
         static void Main(string[] args)
         {
-            IDemoClient client = new DemoClient(new DefaultIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DefaultOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip), 4096);
+            IDemoClient client = new DemoClient(new DemoIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DemoOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip), 4096);
             client.ReconnectInterval = 5000;
             client.HeartbeatInterval = 5000;
             client.InternalError += ClientOnInternalError;
@@ -21,7 +22,7 @@ namespace DemoClient
             client.DataSent += ClientOnDataSent;
             client.UseSsl = true;
             client.AutoReconnect = true;
-//            client.SendHeartbeat = false;
+            //            client.SendHeartbeat = false;
             client.ServerCn = "DemoServer";
             client.ClientCertificate = new X509Certificate2("DemoClient.pfx", "green");
             Connect(client);
@@ -49,10 +50,12 @@ namespace DemoClient
                             quit = true;
                             break;
                         default:
-                            client.SendData(new Packet()
+                            var p = new VHPacket()
                             {
                                 Data = Encoding.UTF8.GetBytes(input)
-                            });
+                            };
+                            p.Headers.Add("Test", Guid.NewGuid().ToString());
+                            client.SendData(p);
                             break;
                     }
                 }

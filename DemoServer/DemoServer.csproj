@@ -50,6 +50,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DemoCommon\DemoCommon.csproj">
+      <Project>{96e171ad-05b5-438a-ac3f-4f4838cbbf43}</Project>
+      <Name>DemoCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SocketClientServerLib\SocketClientServerLib.csproj">
       <Project>{12733501-AA74-44B1-8BB1-4063DF0A4944}</Project>
       <Name>SocketClientServerLib</Name>

@@ -49,7 +49,12 @@ namespace DemoServer
                             quit = true;
                             break;
                         default:
-                            server.Clients.ForEach(client => client.SendData(new Packet() { Data = Encoding.UTF8.GetBytes(input) }));
+                            var p = new VHPacket()
+                            {
+                                Data = Encoding.UTF8.GetBytes(input)
+                            };
+                            p.Headers.Add("Test", Guid.NewGuid().ToString());
+                            server.Clients.ForEach(client => client.SendData(p));
                             break;
                     }
                 }
