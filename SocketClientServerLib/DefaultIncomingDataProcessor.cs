@@ -69,7 +69,7 @@ namespace SocketClientServerLib
                 {
                     var data = new byte[dataLength];
                     _cachedData.Read(data, 0, dataLength);
-                    packets.Add(CreatePacket(compressionType, CompressionUtil.Decompress(compressionType, data)));
+                    packets.Add(CreatePacket(CompressionUtil.Decompress(compressionType, data)));
                 }
                 else
                 {
@@ -102,7 +102,7 @@ namespace SocketClientServerLib
             }
         }
 
-        protected virtual Packet CreatePacket(CompressionType compressionType, byte[] data)
+        protected virtual Packet CreatePacket(byte[] data)
         {
             return new Packet()
             {
