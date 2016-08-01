@@ -2,10 +2,10 @@
 
 namespace SocketClientServerLib
 {
-    public interface ISecurityChecker
+    public interface IIncomingClientChecker
     {
         string Name { get; }
 
-        bool Check(TcpClient tcpClient);
+        bool Allow(TcpClient tcpClient);
     }
 }

@@ -17,7 +17,7 @@ namespace SocketClientServerLib
         private TcpListener _tcpListener;
         private bool _sendHeartbeat = true;
         private int _heartbeatInterval = 60000; // default 60s
-        private readonly List<ISecurityChecker> _securityCheckers = new List<ISecurityChecker>();
+        private readonly List<IIncomingClientChecker> _incomingClientCheckers = new List<IIncomingClientChecker>();
 
         public event Action<IServerBase, Exception> InternalError;
         public event Action<IServerBase, ServerState> StateChanged;
@@ -113,15 +113,15 @@ namespace SocketClientServerLib
 
         private void DoListen()
         {
-            List<ISecurityChecker> securityCheckers = null;
+            List<IIncomingClientChecker> incomingClientCheckers = null;
             lock (_lock)
             {
                 if (State == ServerState.Starting)
                 {
                     State = ServerState.Started;
-                    lock (_securityCheckers)
+                    lock (_incomingClientCheckers)
                     {
-                        securityCheckers = _securityCheckers.ToList();
+                        incomingClientCheckers = _incomingClientCheckers.ToList();
                     }
                 }
             }
@@ -133,11 +133,11 @@ namespace SocketClientServerLib
                     try
                     {
                         var endPoint = (IPEndPoint)tcpClient.Client.RemoteEndPoint;
-                        foreach (var sc in securityCheckers)
+                        foreach (var icc in incomingClientCheckers)
                         {
-                            if (!sc.Check(tcpClient))
+                            if (!icc.Allow(tcpClient))
                             {
-                                throw new SecurityException(string.Format("Security checker \"{0}\" blocked client \"{1}:{2}\".", sc.Name, endPoint.Address, endPoint.Port));
+                                throw new SecurityException(string.Format("Incoming client checker \"{0}\" blocked client \"{1}:{2}\".", icc.Name, endPoint.Address, endPoint.Port));
                             }
                         }
                         var client = CreateServerClient(tcpClient);
@@ -257,21 +257,21 @@ namespace SocketClientServerLib
             }
         }
 
-        public void AddSecurityChecker(ISecurityChecker securityChecker)
+        public void AddIncomingClientChecker(IIncomingClientChecker incomingClientChecker)
         {
             if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
-            lock (_securityCheckers)
+            lock (_incomingClientCheckers)
             {
-                _securityCheckers.Add(securityChecker);
+                _incomingClientCheckers.Add(incomingClientChecker);
             }
         }
 
-        public void RemoveSecurityChecker(ISecurityChecker securityChecker)
+        public void RemoveIncomingClientChecker(IIncomingClientChecker incomingClientChecker)
         {
             if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
-            lock (_securityCheckers)
+            lock (_incomingClientCheckers)
             {
-                _securityCheckers.Remove(securityChecker);
+                _incomingClientCheckers.Remove(incomingClientChecker);
             }
         }
 

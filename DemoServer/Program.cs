@@ -25,7 +25,7 @@ namespace DemoServer
             server.HeartbeatInterval = 5000;
             //            server.SendHeartbeat = false;
             server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
-            server.AddSecurityChecker(new GenericSecurityChecker("Whitelist", client =>
+            server.AddIncomingClientChecker(new GenericIncomingClientChecker("Whitelist", client =>
             {
                 var endPoint = (IPEndPoint)client.Client.RemoteEndPoint;
                 return new[] { "127.0.0.1" }.Contains(endPoint.Address.ToString());

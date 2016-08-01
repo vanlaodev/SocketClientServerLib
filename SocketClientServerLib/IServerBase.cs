@@ -28,8 +28,8 @@ namespace SocketClientServerLib
 
         bool Stop();
 
-        void AddSecurityChecker(ISecurityChecker securityChecker);
+        void AddIncomingClientChecker(IIncomingClientChecker incomingClientChecker);
 
-        void RemoveSecurityChecker(ISecurityChecker securityChecker);
+        void RemoveIncomingClientChecker(IIncomingClientChecker incomingClientChecker);
     }
 }
