@@ -87,7 +87,7 @@ namespace SocketClientServerLib
                 }
                 return replyPacket;
             }
-            throw new InvalidOperationException("Can not send data.");
+            throw new InvalidOperationException("Invalid state.");
         }
 
         public void CancelAll()

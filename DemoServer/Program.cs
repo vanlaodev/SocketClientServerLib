@@ -125,7 +125,11 @@ namespace DemoServer
         {
             try
             {
-                if (!server.Start(54321))
+                var defaultPort = 54321;
+                Console.Write("Enter port: [{0}]", defaultPort);
+                var input = Console.ReadLine();
+                var port = string.IsNullOrEmpty(input) ? defaultPort : int.Parse(input);
+                if (!server.Start(port))
                 {
                     Console.WriteLine("Starting or already started.");
                 }
