@@ -5,6 +5,7 @@ namespace SocketClientServerLib
     public class DefaultOutgoingDataProcessor : IOutgoingDataProcessor
     {
         private const int FixHeaderLength = 7;
+        private int CompressionThreshold = 1024;
 
         private readonly byte[] _fixedHeaderBuffer = new byte[FixHeaderLength];
         private readonly CompressionType _compressionType;
@@ -15,7 +16,6 @@ namespace SocketClientServerLib
 
             _fixedHeaderBuffer[0] = beginning[0];
             _fixedHeaderBuffer[1] = beginning[1];
-            _fixedHeaderBuffer[2] = (byte)_compressionType;
         }
 
         public void Dispose()
@@ -25,7 +25,12 @@ namespace SocketClientServerLib
 
         public byte[] Process(Packet packet)
         {
-            var data = CompressionUtil.Compress(_compressionType, GetDataBytes(packet));
+            var rawData = GetDataBytes(packet);
+            var compressionType = rawData != null && rawData.Length > CompressionThreshold
+                ? _compressionType
+                : CompressionType.None;
+            _fixedHeaderBuffer[2] = (byte)compressionType;
+            var data = CompressionUtil.Compress(compressionType, rawData);
             var dataLength = data == null ? 0 : data.Length;
             ConversionUtil.ToBytes(_fixedHeaderBuffer, 3, 4, dataLength);
             var result = new byte[dataLength + FixHeaderLength];
