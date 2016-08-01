@@ -126,9 +126,14 @@ namespace DemoServer
             try
             {
                 var defaultPort = 54321;
+                var defaultUseSSL = true;
                 Console.Write("Enter port [{0}]: ", defaultPort);
                 var input = Console.ReadLine();
                 var port = string.IsNullOrEmpty(input) ? defaultPort : int.Parse(input);
+                Console.Write("Use SSL [{0}]: ", defaultUseSSL);
+                input = Console.ReadLine();
+                var useSSL = string.IsNullOrEmpty(input) ? defaultUseSSL : bool.Parse(input);
+                server.UseSsl = useSSL;
                 if (!server.Start(port))
                 {
                     Console.WriteLine("Starting or already started.");
@@ -142,6 +147,14 @@ namespace DemoServer
 
         private static void ServerOnInternalError(IServerBase serverBase, Exception exception)
         {
+            if (exception is AggregateException)
+            {
+                foreach (var ie in ((AggregateException) exception).InnerExceptions)
+                {
+                    Console.WriteLine("Internal error: " + ie);
+                }
+                return;
+            }
             Console.WriteLine("Internal error: " + exception.Message);
         }
 

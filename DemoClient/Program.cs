@@ -121,12 +121,17 @@ namespace DemoClient
             {
                 var defaultHost = "localhost";
                 var defaultPort = 54321;
+                var defaultUseSSL = true;
                 Console.Write("Enter host [{0}]: ", defaultHost);
                 var input = Console.ReadLine();
                 var host = string.IsNullOrEmpty(input) ? defaultHost : input;
                 Console.Write("Enter port [{0}]: ", defaultPort);
                 input = Console.ReadLine();
                 var port = string.IsNullOrEmpty(input) ? defaultPort : int.Parse(input);
+                Console.Write("Use SSL [{0}]: ", defaultUseSSL);
+                input = Console.ReadLine();
+                var useSSL = string.IsNullOrEmpty(input) ? defaultUseSSL : bool.Parse(input);
+                client.UseSsl = useSSL;
                 if (!client.Connect(host, port))
                 {
                     Console.WriteLine("Connecting or already connected.");

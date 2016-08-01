@@ -13,6 +13,7 @@ namespace SocketClientServerLib
         private bool _useSsl;
         private int _authenticateTimeout;
         private X509Certificate2 _serverCertificate;
+        private SslProtocols _sslProtocols = SslProtocols.Tls;
 
         public bool UseSsl
         {
@@ -44,9 +45,20 @@ namespace SocketClientServerLib
             }
         }
 
+        public SslProtocols SslProtocols
+        {
+            get { return _sslProtocols; }
+            set
+            {
+                if (State != SessionState.Disconnected && State != SessionState.Disconnecting) throw new InvalidOperationException("Invalid session state.");
+                _sslProtocols = value;
+            }
+        }
+
         public string ClientCn { get; private set; }
 
-        protected SslServerSessionBase(IIncomingDataProcessor incomingDataProcessor, IOutgoingDataProcessor outgoingDataProcessor, int receiveBufferSize) : base(incomingDataProcessor, outgoingDataProcessor, receiveBufferSize)
+        protected SslServerSessionBase(IIncomingDataProcessor incomingDataProcessor, IOutgoingDataProcessor outgoingDataProcessor, int receiveBufferSize)
+            : base(incomingDataProcessor, outgoingDataProcessor, receiveBufferSize)
         {
         }
 
@@ -63,7 +75,7 @@ namespace SocketClientServerLib
 
         private async Task<SslStream> AuthenticateAsync(SslStream sslStream)
         {
-            var authenticateTask = sslStream.AuthenticateAsServerAsync(ServerCertificate, true, SslProtocols.Tls12, false);
+            var authenticateTask = sslStream.AuthenticateAsServerAsync(ServerCertificate, true, SslProtocols, false);
             if (await Task.WhenAny(authenticateTask, Task.Delay(AuthenticateTimeout)) != authenticateTask)
             {
                 throw new TimeoutException("Ssl authentication timed-out.");

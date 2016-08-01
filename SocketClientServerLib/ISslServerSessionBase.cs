@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SocketClientServerLib
 {
@@ -9,6 +10,8 @@ namespace SocketClientServerLib
         int AuthenticateTimeout { get; set; }
 
         X509Certificate2 ServerCertificate { get; set; }
+
+        SslProtocols SslProtocols { get; set; }
 
         string ClientCn { get; }
     }
