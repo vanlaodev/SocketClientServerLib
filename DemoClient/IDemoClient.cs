@@ -1,8 +1,9 @@
-﻿using SocketClientServerLib;
+﻿using DemoCommon;
+using SocketClientServerLib;
 
 namespace DemoClient
 {
-    public interface IDemoClient : ISslClientSessionBase
+    public interface IDemoClient : ISslClientSessionBase, IDemoSessionCommon
     {
 
     }

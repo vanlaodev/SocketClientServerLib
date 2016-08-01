@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
+using DemoCommon;
 using SocketClientServerLib;
 
 namespace DemoServer
@@ -19,7 +21,7 @@ namespace DemoServer
             server.ClientSendDataReady += ServerOnClientSendDataReady;
             server.UseSsl = true;
             server.HeartbeatInterval = 5000;
-//            server.SendHeartbeat = false;
+            //            server.SendHeartbeat = false;
             server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
             StartServer(server);
 
@@ -49,12 +51,7 @@ namespace DemoServer
                             quit = true;
                             break;
                         default:
-                            var p = new VHPacket()
-                            {
-                                Data = Encoding.UTF8.GetBytes(input)
-                            };
-                            p.Headers.Add("Test", Guid.NewGuid().ToString());
-                            server.Clients.ForEach(client => client.SendData(p));
+                            server.Clients.ForEach(client => ((IDemoServerClient)client).SendAndForget(input));
                             break;
                     }
                 }
@@ -84,6 +81,12 @@ namespace DemoServer
                 return;
             }
             Console.WriteLine("Client data received: " + Encoding.UTF8.GetString(arg3.Data));
+            if (arg3 is DemoPacket)
+            {
+                var dp = (DemoPacket)arg3;
+//                Thread.Sleep(5000); // simulate IO works
+                ((IDemoServerClient)sessionBase).Reply(dp.Id, dp.Text); // echo
+            }
         }
 
         private static void ServerOnClientInternalError(IServerBase serverBase, IServerSessionBase serverSessionBase, Exception arg3)

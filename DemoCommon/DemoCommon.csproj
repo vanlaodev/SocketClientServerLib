@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="DemoIncomingDataProcessor.cs" />
     <Compile Include="DemoOutgoingDataProcessor.cs" />
+    <Compile Include="DemoPacket.cs" />
+    <Compile Include="IDemoSessionCommon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

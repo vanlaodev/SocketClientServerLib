@@ -53,6 +53,8 @@
     <Compile Include="ISslServerBase.cs" />
     <Compile Include="ISslServerSessionBase.cs" />
     <Compile Include="Packet.cs" />
+    <Compile Include="SendAndWaitReplyCoordinator.cs" />
+    <Compile Include="SNWRPacket.cs" />
     <Compile Include="VHIncomingDataProcessorBase.cs" />
     <Compile Include="VHOutgoingDataProcessorBase.cs" />
     <Compile Include="VHPacket.cs" />

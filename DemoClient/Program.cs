@@ -50,18 +50,27 @@ namespace DemoClient
                             quit = true;
                             break;
                         default:
-                            var p = new VHPacket()
-                            {
-                                Data = Encoding.UTF8.GetBytes(input)
-                            };
-                            p.Headers.Add("Test", Guid.NewGuid().ToString());
-                            client.SendData(p);
+                            //                            client.SendAndForget(input);
+                            EchoTest(client, input);
                             break;
                     }
                 }
             } while (!quit);
 
             client.Dispose();
+        }
+
+        private static void EchoTest(IDemoClient client, string input)
+        {
+            try
+            {
+                var reply = client.SendAndWaitReply(input, 5000);
+                Console.WriteLine("Replied: " + reply);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Echo test error: " + ex.Message);
+            }
         }
 
         private static void ClientOnSendDataReady(ISessionBase sessionBase, bool b)
@@ -83,6 +92,10 @@ namespace DemoClient
             {
                 Console.WriteLine("Heartbeat.");
                 return;
+            }
+            if (packet is DemoPacket && !string.IsNullOrEmpty(((DemoPacket)packet).ReplyId))
+            {
+                return; // ignored the echo packet
             }
             Console.WriteLine("Data received: " + Encoding.UTF8.GetString(packet.Data));
         }

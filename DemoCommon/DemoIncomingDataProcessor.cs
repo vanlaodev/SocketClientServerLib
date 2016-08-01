@@ -19,5 +19,13 @@ namespace DemoCommon
                 return serializer.Unpack(ms);
             }
         }
+
+        protected override VHPacket CreatePacket(Dictionary<string, string> headers, byte[] realData)
+        {
+            return new DemoPacket(headers)
+            {
+                Data = realData
+            };
+        }
     }
 }

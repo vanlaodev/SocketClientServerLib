@@ -15,6 +15,11 @@ namespace SocketClientServerLib
             var headers = DeserializeHeaders(data, 4, headersLength);
             var realData = new byte[data.Length - headersLength - 4];
             Array.Copy(data, 4 + headersLength, realData, 0, realData.Length);
+            return CreatePacket(headers, realData);
+        }
+
+        protected virtual VHPacket CreatePacket(Dictionary<string, string> headers, byte[] realData)
+        {
             return new VHPacket(headers)
             {
                 Data = realData
