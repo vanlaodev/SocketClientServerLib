@@ -5,11 +5,12 @@ namespace SocketClientServerLib
 {
     public abstract class VHIncomingDataProcessorBase : DefaultIncomingDataProcessor
     {
-        protected VHIncomingDataProcessorBase(byte[] beginning) : base(beginning)
+        protected VHIncomingDataProcessorBase(byte[] beginning)
+            : base(beginning)
         {
         }
 
-        protected override Packet CreatePacket(byte[] data)
+        protected sealed override Packet CreatePacket(byte[] data)
         {
             var headersLength = ConversionUtil.ToInt32(data, 0, 4);
             var headers = DeserializeHeaders(data, 4, headersLength);
