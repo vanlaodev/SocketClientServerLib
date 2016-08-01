@@ -121,10 +121,10 @@ namespace DemoClient
             {
                 var defaultHost = "localhost";
                 var defaultPort = 54321;
-                Console.Write("Enter host: [{0}]", defaultHost);
+                Console.Write("Enter host [{0}]: ", defaultHost);
                 var input = Console.ReadLine();
                 var host = string.IsNullOrEmpty(input) ? defaultHost : input;
-                Console.Write("Enter port: [{0}]", defaultPort);
+                Console.Write("Enter port [{0}]: ", defaultPort);
                 input = Console.ReadLine();
                 var port = string.IsNullOrEmpty(input) ? defaultPort : int.Parse(input);
                 if (!client.Connect(host, port))
