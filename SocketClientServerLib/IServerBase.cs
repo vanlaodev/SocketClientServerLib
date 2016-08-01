@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace SocketClientServerLib
 {
@@ -13,6 +14,8 @@ namespace SocketClientServerLib
         event Action<IServerBase, ISessionBase, Packet> ClientDataReceived;
         event Action<IServerBase, ISessionBase, bool> ClientSendDataReady;
 
+        IPEndPoint EndPoint { get; }
+
         bool SendHeartbeat { get; set; }
 
         int HeartbeatInterval { get; set; }
@@ -24,5 +27,9 @@ namespace SocketClientServerLib
         bool Start(int port);
 
         bool Stop();
+
+        void AddSecurityChecker(ISecurityChecker securityChecker);
+
+        void RemoveSecurityChecker(ISecurityChecker securityChecker);
     }
 }

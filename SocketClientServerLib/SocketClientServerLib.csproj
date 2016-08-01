@@ -41,11 +41,13 @@
     <Compile Include="ConversionUtil.cs" />
     <Compile Include="DefaultIncomingDataProcessor.cs" />
     <Compile Include="DefaultOutgoingDataProcessor.cs" />
+    <Compile Include="GenericSecurityChecker.cs" />
     <Compile Include="HeartbeatPacket.cs" />
     <Compile Include="HeartbeatWorker.cs" />
     <Compile Include="IClientSessionBase.cs" />
     <Compile Include="IIncomingDataProcessor.cs" />
     <Compile Include="IOutgoingDataProcessor.cs" />
+    <Compile Include="ISecurityChecker.cs" />
     <Compile Include="IServerBase.cs" />
     <Compile Include="IServerSessionBase.cs" />
     <Compile Include="ISessionBase.cs" />

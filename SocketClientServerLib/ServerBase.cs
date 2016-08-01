@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security;
 using System.Threading;
 
 namespace SocketClientServerLib
@@ -16,6 +17,7 @@ namespace SocketClientServerLib
         private TcpListener _tcpListener;
         private bool _sendHeartbeat = true;
         private int _heartbeatInterval = 60000; // default 60s
+        private readonly List<ISecurityChecker> _securityCheckers = new List<ISecurityChecker>();
 
         public event Action<IServerBase, Exception> InternalError;
         public event Action<IServerBase, ServerState> StateChanged;
@@ -24,6 +26,8 @@ namespace SocketClientServerLib
         public event Action<IServerBase, ISessionBase, Packet> ClientDataSent;
         public event Action<IServerBase, ISessionBase, Packet> ClientDataReceived;
         public event Action<IServerBase, ISessionBase, bool> ClientSendDataReady;
+
+        public IPEndPoint EndPoint { get; private set; }
 
         public bool SendHeartbeat
         {
@@ -94,6 +98,7 @@ namespace SocketClientServerLib
                 {
                     _tcpListener = new TcpListener(IPAddress.Any, port);
                     _tcpListener.Start();
+                    EndPoint = (IPEndPoint)_tcpListener.Server.LocalEndPoint;
                     _listenThread = new Thread(DoListen);
                     _listenThread.Start();
                     return true;
@@ -108,11 +113,16 @@ namespace SocketClientServerLib
 
         private void DoListen()
         {
+            List<ISecurityChecker> securityCheckers = null;
             lock (_lock)
             {
                 if (State == ServerState.Starting)
                 {
                     State = ServerState.Started;
+                    lock (_securityCheckers)
+                    {
+                        securityCheckers = _securityCheckers.ToList();
+                    }
                 }
             }
             while (State == ServerState.Started)
@@ -122,6 +132,14 @@ namespace SocketClientServerLib
                     var tcpClient = _tcpListener.AcceptTcpClient();
                     try
                     {
+                        var endPoint = (IPEndPoint)tcpClient.Client.RemoteEndPoint;
+                        foreach (var sc in securityCheckers)
+                        {
+                            if (!sc.Check(tcpClient))
+                            {
+                                throw new SecurityException(string.Format("Security checker \"{0}\" blocked client \"{1}:{2}\".", sc.Name, endPoint.Address, endPoint.Port));
+                            }
+                        }
                         var client = CreateServerClient(tcpClient);
                         client.StateChanged += ClientOnStateChanged;
                         client.InternalError += ClientOnInternalError;
@@ -236,6 +254,24 @@ namespace SocketClientServerLib
                 {
                     State = ServerState.Stopped;
                 }
+            }
+        }
+
+        public void AddSecurityChecker(ISecurityChecker securityChecker)
+        {
+            if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
+            lock (_securityCheckers)
+            {
+                _securityCheckers.Add(securityChecker);
+            }
+        }
+
+        public void RemoveSecurityChecker(ISecurityChecker securityChecker)
+        {
+            if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
+            lock (_securityCheckers)
+            {
+                _securityCheckers.Remove(securityChecker);
             }
         }
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -23,6 +25,11 @@ namespace DemoServer
             server.HeartbeatInterval = 5000;
             //            server.SendHeartbeat = false;
             server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
+            server.AddSecurityChecker(new GenericSecurityChecker("Whitelist", client =>
+            {
+                var endPoint = (IPEndPoint)client.Client.RemoteEndPoint;
+                return new[] { "127.0.0.1" }.Contains(endPoint.Address.ToString());
+            }));
             StartServer(server);
 
             var quit = false;
@@ -84,7 +91,7 @@ namespace DemoServer
             if (arg3 is DemoPacket)
             {
                 var dp = (DemoPacket)arg3;
-//                Thread.Sleep(5000); // simulate IO works
+                //                Thread.Sleep(5000); // simulate IO works
                 ((IDemoServerClient)sessionBase).Reply(dp.Id, dp.Text); // echo
             }
         }
@@ -149,7 +156,7 @@ namespace DemoServer
         {
             if (exception is AggregateException)
             {
-                foreach (var ie in ((AggregateException) exception).InnerExceptions)
+                foreach (var ie in ((AggregateException)exception).InnerExceptions)
                 {
                     Console.WriteLine("Internal error: " + ie);
                 }
