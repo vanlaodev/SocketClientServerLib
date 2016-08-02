@@ -41,7 +41,7 @@ namespace SocketClientServerLib
             }
         }
 
-        public SNWRPacket SendAndWaitReply(SNWRPacket packet, int timeout)
+        public virtual SNWRPacket SendAndWaitReply(SNWRPacket packet, int timeout)
         {
             var waitHandle = new object();
             lock (_waitHandles)
