@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace SocketClientServerLib
 {
@@ -12,6 +13,7 @@ namespace SocketClientServerLib
         private TcpClient _tcpClient;
         private SessionState _state = SessionState.Disconnected;
         private readonly object _stateLock = new object();
+        private readonly object _ensureSendDataReadyLock = new object();
         private readonly SendDataWorker _sendDataWorker;
         private readonly ReceiveDataWorker _receiveDataWorker;
         private readonly HeartbeatWorker _heartbeatWorker;
@@ -117,6 +119,13 @@ namespace SocketClientServerLib
         private void SendDataWorkerOnStateChanged(SendDataWorker sendDataWorker, SendDataWorker.SendDataWorkerState sendDataWorkerState)
         {
             var ready = sendDataWorkerState == SendDataWorker.SendDataWorkerState.Started;
+            if (ready)
+            {
+                lock (_ensureSendDataReadyLock)
+                {
+                    Monitor.Pulse(_ensureSendDataReadyLock);
+                }
+            }
             if (ready && SendHeartbeat)
             {
                 _heartbeatWorker.Start(HeartbeatInterval);
@@ -142,6 +151,19 @@ namespace SocketClientServerLib
             if (DataSent != null)
             {
                 DataSent(this, packet);
+            }
+        }
+
+        public void EnsureSendDataReady(int timeout)
+        {
+            if (State == SessionState.Connected) return;
+            lock (_ensureSendDataReadyLock)
+            {
+                if (State == SessionState.Connected) return;
+                if (!Monitor.Wait(_ensureSendDataReadyLock, timeout))
+                {
+                    throw new TimeoutException("Waiting for send data ready timed-out.");
+                }
             }
         }
 

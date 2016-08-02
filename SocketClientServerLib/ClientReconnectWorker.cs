@@ -57,6 +57,13 @@ namespace SocketClientServerLib
             var workerParameterHolder = (WorkerParameterHolder)obj;
             while (State == ClientReconnectWorkerState.Started)
             {
+                lock (_workerThread)
+                {
+                    if (State == ClientReconnectWorkerState.Started)
+                    {
+                        Monitor.Wait(_workerThread, workerParameterHolder.ReconnectInterval);
+                    }
+                }
                 try
                 {
                     workerParameterHolder.Client.Connect(workerParameterHolder.Host, workerParameterHolder.Port);
@@ -64,13 +71,6 @@ namespace SocketClientServerLib
                 catch
                 {
                     // ignored
-                }
-                lock (_workerThread)
-                {
-                    if (State == ClientReconnectWorkerState.Started)
-                    {
-                        Monitor.Wait(_workerThread, workerParameterHolder.ReconnectInterval);
-                    }
                 }
             }
         }

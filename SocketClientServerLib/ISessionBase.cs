@@ -20,6 +20,8 @@ namespace SocketClientServerLib
 
         int HeartbeatInterval { get; set; }
 
+        void EnsureSendDataReady(int timeout);
+
         bool AttachTcpClient(TcpClient tcpClient);
 
         bool Disconnect();
