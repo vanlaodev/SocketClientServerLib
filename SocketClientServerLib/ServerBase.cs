@@ -87,7 +87,7 @@ namespace SocketClientServerLib
             }
         }
 
-        public bool Start(int port)
+        public bool Start(IPAddress bindAddr, int port)
         {
             if (State != ServerState.Stopped) return false;
             lock (_lock)
@@ -96,7 +96,7 @@ namespace SocketClientServerLib
                 State = ServerState.Starting;
                 try
                 {
-                    _tcpListener = new TcpListener(IPAddress.Any, port);
+                    _tcpListener = new TcpListener(bindAddr, port);
                     _tcpListener.Start();
                     EndPoint = (IPEndPoint)_tcpListener.Server.LocalEndPoint;
                     _listenThread = new Thread(DoListen);

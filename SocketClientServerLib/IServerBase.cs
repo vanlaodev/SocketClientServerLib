@@ -24,7 +24,7 @@ namespace SocketClientServerLib
 
         ServerState State { get; }
 
-        bool Start(int port);
+        bool Start(IPAddress bind, int port);
 
         bool Stop();
 

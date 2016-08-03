@@ -141,7 +141,7 @@ namespace DemoServer
                 input = Console.ReadLine();
                 var useSSL = string.IsNullOrEmpty(input) ? defaultUseSSL : bool.Parse(input);
                 server.UseSsl = useSSL;
-                if (!server.Start(port))
+                if (!server.Start(IPAddress.Any, port))
                 {
                     Console.WriteLine("Starting or already started.");
                 }
