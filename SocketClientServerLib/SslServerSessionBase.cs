@@ -15,6 +15,8 @@ namespace SocketClientServerLib
         private X509Certificate2 _serverCertificate;
         private SslProtocols _sslProtocols = SslProtocols.Tls;
 
+        public event Action<ISslServerSessionBase> SslAuthenticated;
+
         public bool UseSsl
         {
             get { return _useSsl; }
@@ -70,7 +72,12 @@ namespace SocketClientServerLib
                 return stream;
             }
             var sslStream = new SslStream(stream, false, UserCertificateValidationCallback, null);
-            return AuthenticateAsync(sslStream).Result;
+            sslStream = AuthenticateAsync(sslStream).Result;
+            if (SslAuthenticated != null)
+            {
+                SslAuthenticated(this);
+            }
+            return sslStream;
         }
 
         private async Task<SslStream> AuthenticateAsync(SslStream sslStream)

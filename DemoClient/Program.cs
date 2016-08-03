@@ -20,6 +20,7 @@ namespace DemoClient
             client.DataReceived += ClientOnDataReceived;
             client.SendDataReady += ClientOnSendDataReady;
             client.DataSent += ClientOnDataSent;
+            client.SslAuthenticated += ClientOnSslAuthenticated;
             client.UseSsl = true;
             client.AutoReconnect = true;
             //            client.SendHeartbeat = false;
@@ -58,6 +59,11 @@ namespace DemoClient
             } while (!quit);
 
             client.Dispose();
+        }
+
+        private static void ClientOnSslAuthenticated(ISslClientSessionBase sslClientSessionBase)
+        {
+            Console.WriteLine("SSL authenticated.");
         }
 
         private static void EchoTest(IDemoClient client, string input)

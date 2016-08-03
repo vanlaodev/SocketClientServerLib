@@ -1,10 +1,13 @@
-﻿using System.Security.Authentication;
+﻿using System;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SocketClientServerLib
 {
     public interface ISslServerSessionBase : IServerSessionBase
     {
+        event Action<ISslServerSessionBase> SslAuthenticated;
+
         bool UseSsl { get; set; }
 
         int AuthenticateTimeout { get; set; }

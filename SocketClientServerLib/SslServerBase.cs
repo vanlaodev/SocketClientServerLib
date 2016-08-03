@@ -13,6 +13,8 @@ namespace SocketClientServerLib
         private X509Certificate2 _serverCertificate;
         private SslProtocols _sslProtocols = SslProtocols.Tls;
 
+        public event Action<ISslServerBase, ISslServerSessionBase> ClientSslAuthenticated;
+
         public bool UseSsl
         {
             get { return _useSsl; }
@@ -60,7 +62,16 @@ namespace SocketClientServerLib
             serverClient.ServerCertificate = ServerCertificate;
             serverClient.UseSsl = UseSsl;
             serverClient.SslProtocols = SslProtocols;
+            serverClient.SslAuthenticated += ServerClientOnSslAuthenticated;
             return serverClient;
+        }
+
+        private void ServerClientOnSslAuthenticated(ISslServerSessionBase sslServerSessionBase)
+        {
+            if (ClientSslAuthenticated != null)
+            {
+                ClientSslAuthenticated(this, sslServerSessionBase);
+            }
         }
 
         protected abstract ISslServerSessionBase CreateSslServerClient(TcpClient tcpClient);

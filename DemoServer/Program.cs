@@ -22,6 +22,7 @@ namespace DemoServer
             server.ClientDataSent += ServerOnClientDataSent;
             server.ClientSendDataReady += ServerOnClientSendDataReady;
             server.UseSsl = true;
+            server.ClientSslAuthenticated += ServerOnClientSslAuthenticated;
             server.HeartbeatInterval = 5000;
             //            server.SendHeartbeat = false;
             server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
@@ -65,6 +66,11 @@ namespace DemoServer
             } while (!quit);
 
             server.Dispose();
+        }
+
+        private static void ServerOnClientSslAuthenticated(ISslServerBase sslServerBase, ISslServerSessionBase sslServerSessionBase)
+        {
+            Console.WriteLine("client SSL authenticated. CN=" + sslServerSessionBase.ClientCn);
         }
 
         private static void ServerOnClientSendDataReady(IServerBase serverBase, ISessionBase sessionBase, bool arg3)
