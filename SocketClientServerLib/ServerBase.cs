@@ -137,7 +137,7 @@ namespace SocketClientServerLib
                         {
                             if (!icc.Allow(tcpClient))
                             {
-                                throw new SecurityException(string.Format("Incoming client checker \"{0}\" blocked client \"{1}:{2}\".", icc.Name, endPoint.Address, endPoint.Port));
+                                throw new UnauthorizedAccessException(string.Format("Incoming client checker \"{0}\" blocked client \"{1}:{2}\".", icc.Name, endPoint.Address, endPoint.Port));
                             }
                         }
                         var client = CreateServerClient(tcpClient);

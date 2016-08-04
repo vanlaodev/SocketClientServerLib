@@ -167,9 +167,29 @@ namespace SocketClientServerLib
             }
         }
 
-        public virtual bool AttachTcpClient(TcpClient tcpClient)
+        public bool AttachTcpClient(TcpClient tcpClient)
         {
-            return AttachTcpClient(() => tcpClient);
+            if (State != SessionState.Disconnected) return false;
+            lock (_lock)
+            {
+                if (State != SessionState.Disconnected) return false;
+                try
+                {
+                    State = SessionState.Connecting;
+                    _tcpClient = tcpClient;
+                    EndPoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
+                    _stream = GetStream(_tcpClient);
+                    State = SessionState.Connected;
+                    _sendDataWorker.Start(_stream);
+                    _receiveDataWorker.Start(_stream);
+                    return true;
+                }
+                catch
+                {
+                    State = SessionState.Disconnected;
+                    throw;
+                }
+            }
         }
 
         public bool Disconnect()
@@ -201,30 +221,6 @@ namespace SocketClientServerLib
             {
                 if (State != SessionState.Connected) return false;
                 return _sendDataWorker.SendData(data);
-            }
-        }
-
-        protected bool AttachTcpClient(Func<TcpClient> getTcpClient)
-        {
-            if (State != SessionState.Disconnected) return false;
-            lock (_lock)
-            {
-                if (State != SessionState.Disconnected) return false;
-                try
-                {
-                    _tcpClient = getTcpClient();
-                    EndPoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
-                    _stream = GetStream(_tcpClient);
-                    State = SessionState.Connected;
-                    _sendDataWorker.Start(_stream);
-                    _receiveDataWorker.Start(_stream);
-                    return true;
-                }
-                catch
-                {
-                    State = SessionState.Disconnected;
-                    throw;
-                }
             }
         }
 
