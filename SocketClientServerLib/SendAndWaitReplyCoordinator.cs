@@ -48,59 +48,73 @@ namespace SocketClientServerLib
             {
                 _waitHandles.Add(packet.Id, waitHandle);
             }
-            if (_session.SendData(packet))
+            try
             {
-                var replied = false;
-                SNWRPacket replyPacket = null;
-                lock (waitHandle)
+                if (_session.SendData(packet))
                 {
-                    lock (_replies)
+                    var replied = false;
+                    SNWRPacket replyPacket = null;
+                    lock (waitHandle)
                     {
-                        if (_replies.ContainsKey(packet.Id))
+                        lock (_replies)
                         {
-                            replyPacket = _replies[packet.Id];
-                            replied = true;
-                        }
-                    }
-                    if (!replied)
-                    {
-                        replied = Monitor.Wait(waitHandle, timeout);
-                        if (replied)
-                        {
-                            lock (_replies)
+                            if (_replies.ContainsKey(packet.Id))
                             {
-                                if (_replies.ContainsKey(packet.Id))
+                                replyPacket = _replies[packet.Id];
+                                replied = true;
+                            }
+                        }
+                        if (!replied)
+                        {
+                            replied = Monitor.Wait(waitHandle, timeout);
+                            if (replied)
+                            {
+                                lock (_replies)
                                 {
-                                    replyPacket = _replies[packet.Id];
+                                    if (_replies.ContainsKey(packet.Id))
+                                    {
+                                        replyPacket = _replies[packet.Id];
+                                    }
                                 }
                             }
                         }
                     }
+                    if (!replied)
+                    {
+                        throw new TimeoutException();
+                    }
+                    if (replyPacket == null)
+                    {
+                        throw new OperationCanceledException();
+                    }
+                    return replyPacket;
                 }
-                if (!replied)
-                {
-                    throw new TimeoutException();
-                }
-                if (replyPacket == null)
-                {
-                    throw new OperationCanceledException();
-                }
-                return replyPacket;
+                throw new InvalidOperationException("Invalid state.");
             }
-            throw new InvalidOperationException("Invalid state.");
+            finally
+            {
+                lock (_waitHandles)
+                {
+                    _waitHandles.Remove(packet.Id);
+                }
+                lock (_replies)
+                {
+                    _replies.Remove(packet.Id);
+                }
+            }
         }
 
         public void CancelAll()
         {
-            lock (_replies)
-            {
-                _replies.Clear();
-            }
             IEnumerable<object> waitHandles;
             lock (_waitHandles)
             {
                 waitHandles = _waitHandles.Values.ToList();
                 _waitHandles.Clear();
+            }
+            lock (_replies)
+            {
+                _replies.Clear();
             }
             foreach (var waitHandle in waitHandles)
             {

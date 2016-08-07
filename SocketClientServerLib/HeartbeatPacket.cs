@@ -17,5 +17,10 @@ namespace SocketClientServerLib
                 throw new InvalidOperationException();
             }
         }
+
+        public override object Clone()
+        {
+            throw new NotSupportedException();
+        }
     }
 }

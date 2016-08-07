@@ -46,7 +46,7 @@ namespace SocketClientServerLib
             {
                 LastHost = host;
                 LastPort = port;
-                return AttachTcpClient(new TcpClient(host, port));
+                return AttachTcpClient(() => new TcpClient(host, port));
             }
             catch (Exception ex)
             {

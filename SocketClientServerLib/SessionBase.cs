@@ -169,6 +169,11 @@ namespace SocketClientServerLib
 
         public bool AttachTcpClient(TcpClient tcpClient)
         {
+            return AttachTcpClient(() => tcpClient);
+        }
+
+        protected virtual bool AttachTcpClient(Func<TcpClient> getTcpClient)
+        {
             if (State != SessionState.Disconnected) return false;
             lock (_lock)
             {
@@ -176,7 +181,7 @@ namespace SocketClientServerLib
                 try
                 {
                     State = SessionState.Connecting;
-                    _tcpClient = tcpClient;
+                    _tcpClient = getTcpClient();
                     EndPoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
                     _stream = GetStream(_tcpClient);
                     State = SessionState.Connected;

@@ -15,5 +15,19 @@ namespace SocketClientServerLib
         {
             Headers = headers;
         }
+
+        public override object Clone()
+        {
+            return new VHPacket(CloneHeaders())
+            {
+                Data = CloneInternalData()
+            };
+        }
+
+        protected virtual Dictionary<string, string> CloneHeaders()
+        {
+            if (Headers == null) return null;
+            return new Dictionary<string, string>(Headers);
+        }
     }
 }

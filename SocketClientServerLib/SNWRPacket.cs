@@ -26,5 +26,13 @@ namespace SocketClientServerLib
         public SNWRPacket(Dictionary<string, string> headers) : base(headers)
         {
         }
+
+        public override object Clone()
+        {
+            return new SNWRPacket(CloneHeaders())
+            {
+                Data = CloneInternalData()
+            };
+        }
     }
 }

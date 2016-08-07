@@ -20,5 +20,13 @@ namespace DemoCommon
         public DemoPacket(Dictionary<string, string> headers) : base(headers)
         {
         }
+
+        public override object Clone()
+        {
+            return new DemoPacket(CloneHeaders())
+            {
+                Data = CloneInternalData()
+            };
+        }
     }
 }
