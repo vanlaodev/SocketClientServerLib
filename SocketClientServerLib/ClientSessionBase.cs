@@ -5,7 +5,6 @@ namespace SocketClientServerLib
 {
     public abstract class ClientSessionBase : SessionBase, IClientSessionBase
     {
-        private int _reconnectInterval = 15000; // default 15s
         private readonly ClientReconnectWorker _clientReconnectWorker;
 
         public int LastPort { get; private set; }
@@ -19,6 +18,7 @@ namespace SocketClientServerLib
             _clientReconnectWorker.StateChanged += ClientReconnectWorkerOnStateChanged;
 
             AutoReconnect = true;
+            ReconnectInterval = 15000; // default 15s
 
             StateChanged += OnStateChanged;
         }
