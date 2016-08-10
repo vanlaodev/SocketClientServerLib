@@ -44,7 +44,7 @@ namespace SocketClientServerLib
             _buffer = new byte[bufferSize];
         }
 
-        public bool Start(Stream stream)
+        public bool Start(Stream stream, bool reset)
         {
             if (State != ReceiveDataWorkerState.Stopped) return false;
             lock (_lock)
@@ -52,6 +52,10 @@ namespace SocketClientServerLib
                 if (State != ReceiveDataWorkerState.Stopped) return false;
                 if (stream == null) throw new ArgumentNullException("stream");
                 State = ReceiveDataWorkerState.Starting;
+                if (reset)
+                {
+                    _incomingDataProcessor.Reset();
+                }
                 _workerThread = new Thread(DoReceive);
                 _workerThread.Start(stream);
                 return true;
@@ -66,7 +70,6 @@ namespace SocketClientServerLib
                 {
                     State = ReceiveDataWorkerState.Started;
                     _cts = new CancellationTokenSource();
-                    _incomingDataProcessor.Reset();
                 }
             }
             var stream = (Stream)obj;

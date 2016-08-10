@@ -186,7 +186,7 @@ namespace SocketClientServerLib
                     _stream = GetStream(_tcpClient);
                     State = SessionState.Connected;
                     _sendDataWorker.Start(_stream);
-                    _receiveDataWorker.Start(_stream);
+                    _receiveDataWorker.Start(_stream, true);
                     return true;
                 }
                 catch
