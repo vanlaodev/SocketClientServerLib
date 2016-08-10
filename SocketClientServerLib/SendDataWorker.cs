@@ -109,6 +109,7 @@ namespace SocketClientServerLib
                 {
                     var dataBytes = _outgoingDataProcessor.Process(dataToBeSent);
                     stream.Write(dataBytes, 0, dataBytes.Length);
+                    stream.Flush();
                     if (Sent != null)
                     {
                         Sent(this, dataToBeSent);
