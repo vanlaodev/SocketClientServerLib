@@ -19,6 +19,8 @@ namespace SocketClientServerLib
         private readonly HeartbeatWorker _heartbeatWorker;
         private bool _sendHeartbeat = true;
         private int _heartbeatInterval = 60000; // default 60s
+        private int _readTimeout = Timeout.Infinite;
+        private int _writeTimeout = Timeout.Infinite;
 
         public event Action<ISessionBase, SessionState> StateChanged;
 
@@ -26,6 +28,26 @@ namespace SocketClientServerLib
         public event Action<ISessionBase, Packet> DataSent;
         public event Action<ISessionBase, Packet> DataReceived;
         public event Action<ISessionBase, bool> SendDataReady;
+
+        public int ReadTimeout
+        {
+            get { return _readTimeout; }
+            set
+            {
+                if (State != SessionState.Disconnected && State != SessionState.Disconnecting) throw new InvalidOperationException("Invalid session state.");
+                _readTimeout = value;
+            }
+        }
+
+        public int WriteTimeout
+        {
+            get { return _writeTimeout; }
+            set
+            {
+                if (State != SessionState.Disconnected && State != SessionState.Disconnecting) throw new InvalidOperationException("Invalid session state.");
+                _writeTimeout = value;
+            }
+        }
 
         public bool SendHeartbeat
         {
@@ -184,9 +206,11 @@ namespace SocketClientServerLib
                     _tcpClient = getTcpClient();
                     EndPoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
                     _stream = GetStream(_tcpClient);
+                    _stream.WriteTimeout = WriteTimeout;
+                    _stream.ReadTimeout = ReadTimeout;
                     State = SessionState.Connected;
                     _sendDataWorker.Start(_stream);
-                    _receiveDataWorker.Start(_stream, true);
+                    _receiveDataWorker.Start(_stream);
                     return true;
                 }
                 catch
@@ -206,10 +230,10 @@ namespace SocketClientServerLib
                 State = SessionState.Disconnecting;
                 try
                 {
-                    _sendDataWorker.Stop();
-                    _receiveDataWorker.Stop();
                     _stream.Close();
                     _tcpClient.Close();
+                    _sendDataWorker.Stop();
+                    _receiveDataWorker.Stop();
                     return true;
                 }
                 finally

@@ -17,6 +17,8 @@ namespace SocketClientServerLib
         private TcpListener _tcpListener;
         private bool _sendHeartbeat = true;
         private int _heartbeatInterval = 60000; // default 60s
+        private int _readTimeout = Timeout.Infinite;
+        private int _writeTimeout = Timeout.Infinite;
         private readonly List<IIncomingClientChecker> _incomingClientCheckers = new List<IIncomingClientChecker>();
 
         public event Action<IServerBase, Exception> InternalError;
@@ -28,6 +30,26 @@ namespace SocketClientServerLib
         public event Action<IServerBase, ISessionBase, bool> ClientSendDataReady;
 
         public IPEndPoint EndPoint { get; private set; }
+
+        public int ReadTimeout
+        {
+            get { return _readTimeout; }
+            set
+            {
+                if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
+                _readTimeout = value;
+            }
+        }
+
+        public int WriteTimeout
+        {
+            get { return _writeTimeout; }
+            set
+            {
+                if (State != ServerState.Stopping && State != ServerState.Stopped) throw new InvalidOperationException("Invalid server state.");
+                _writeTimeout = value;
+            }
+        }
 
         public bool SendHeartbeat
         {
@@ -148,6 +170,8 @@ namespace SocketClientServerLib
                         client.SendHeartbeat = SendHeartbeat;
                         client.HeartbeatInterval = HeartbeatInterval;
                         client.SendDataReady += ClientOnSendDataReady;
+                        client.ReadTimeout = ReadTimeout;
+                        client.WriteTimeout = WriteTimeout;
                         client.AttachTcpClient(tcpClient);
                     }
                     catch (Exception ex)

@@ -17,8 +17,6 @@ namespace SocketClientServerLib
         public event Action<ReceiveDataWorker, Exception> Error;
         public event Action<ReceiveDataWorker, Packet> Received;
 
-        private CancellationTokenSource _cts;
-
         public ReceiveDataWorkerState State
         {
             get
@@ -44,7 +42,7 @@ namespace SocketClientServerLib
             _buffer = new byte[bufferSize];
         }
 
-        public bool Start(Stream stream, bool reset)
+        public bool Start(Stream stream)
         {
             if (State != ReceiveDataWorkerState.Stopped) return false;
             lock (_lock)
@@ -52,24 +50,20 @@ namespace SocketClientServerLib
                 if (State != ReceiveDataWorkerState.Stopped) return false;
                 if (stream == null) throw new ArgumentNullException("stream");
                 State = ReceiveDataWorkerState.Starting;
-                if (reset)
-                {
-                    _incomingDataProcessor.Reset();
-                }
+                _incomingDataProcessor.Reset();
                 _workerThread = new Thread(DoReceive);
                 _workerThread.Start(stream);
                 return true;
             }
         }
 
-        private async void DoReceive(object obj)
+        private void DoReceive(object obj)
         {
             lock (_lock)
             {
                 if (State == ReceiveDataWorkerState.Starting)
                 {
                     State = ReceiveDataWorkerState.Started;
-                    _cts = new CancellationTokenSource();
                 }
             }
             var stream = (Stream)obj;
@@ -77,7 +71,7 @@ namespace SocketClientServerLib
             {
                 try
                 {
-                    var lenRead = await stream.ReadAsync(_buffer, 0, _buffer.Length, _cts.Token);
+                    var lenRead = stream.Read(_buffer, 0, _buffer.Length);
                     if (lenRead == 0)
                     {
                         throw new EndOfStreamException("Remote end has closed the connection.");
@@ -107,6 +101,7 @@ namespace SocketClientServerLib
             }
         }
 
+        // must be called after closing connection operations
         public bool Stop()
         {
             if (State != ReceiveDataWorkerState.Started) return false;
@@ -114,10 +109,6 @@ namespace SocketClientServerLib
             {
                 if (State != ReceiveDataWorkerState.Started) return false;
                 State = ReceiveDataWorkerState.Stopping;
-                if (_cts != null)
-                {
-                    _cts.Cancel();
-                }
                 if (!Thread.CurrentThread.Equals(_workerThread))
                 {
                     _workerThread.Join();

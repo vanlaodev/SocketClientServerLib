@@ -23,8 +23,6 @@ namespace SocketClientServerLib
         public event Action<SendDataWorker, Exception> Error;
         public event Action<SendDataWorker, Packet> Sent;
 
-        private CancellationTokenSource _cts;
-
         public SendDataWorkerState State
         {
             get
@@ -70,14 +68,13 @@ namespace SocketClientServerLib
             }
         }
 
-        private async void DoSend(object obj)
+        private void DoSend(object obj)
         {
             lock (_lock)
             {
                 if (State == SendDataWorkerState.Starting)
                 {
                     State = SendDataWorkerState.Started;
-                    _cts = new CancellationTokenSource();
                 }
             }
             var stream = (Stream)obj;
@@ -111,8 +108,8 @@ namespace SocketClientServerLib
                 try
                 {
                     var dataBytes = _outgoingDataProcessor.Process(dataToBeSent);
-                    await stream.WriteAsync(dataBytes, 0, dataBytes.Length, _cts.Token);
-//                    await stream.FlushAsync();
+                    stream.Write(dataBytes, 0, dataBytes.Length);
+                    stream.Flush();
                     if (Sent != null)
                     {
                         Sent(this, dataToBeSent);
@@ -134,6 +131,7 @@ namespace SocketClientServerLib
             }
         }
 
+        // must be called after closing connection operations
         public bool Stop()
         {
             if (State != SendDataWorkerState.Started) return false;
@@ -141,10 +139,6 @@ namespace SocketClientServerLib
             {
                 if (State != SendDataWorkerState.Started) return false;
                 State = SendDataWorkerState.Stopping;
-                if (_cts != null)
-                {
-                    _cts.Cancel();
-                }
                 lock (_sendQueue)
                 {
                     _sendQueue.Clear();

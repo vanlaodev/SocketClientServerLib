@@ -16,6 +16,10 @@ namespace SocketClientServerLib
 
         SessionState State { get; }
 
+        int ReadTimeout { get; set; }
+
+        int WriteTimeout { get; set; }
+
         bool SendHeartbeat { get; set; }
 
         int HeartbeatInterval { get; set; }
