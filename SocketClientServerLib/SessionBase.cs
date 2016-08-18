@@ -176,12 +176,21 @@ namespace SocketClientServerLib
             }
         }
 
+        public bool IsSendDataReady
+        {
+            get
+            {
+                return State == SessionState.Connected && _sendDataWorker != null &&
+                       _sendDataWorker.State == SendDataWorker.SendDataWorkerState.Started;
+            }
+        }
+
         public void EnsureSendDataReady(int timeout)
         {
-            if (State == SessionState.Connected) return;
+            if (IsSendDataReady) return;
             lock (_ensureSendDataReadyLock)
             {
-                if (State == SessionState.Connected) return;
+                if (IsSendDataReady) return;
                 if (!Monitor.Wait(_ensureSendDataReadyLock, timeout))
                 {
                     throw new TimeoutException("Waiting for send data ready timed-out.");
@@ -245,10 +254,10 @@ namespace SocketClientServerLib
 
         public bool SendData(Packet data)
         {
-            if (State != SessionState.Connected) return false;
+            if (!IsSendDataReady) return false;
             lock (_lock)
             {
-                if (State != SessionState.Connected) return false;
+                if (!IsSendDataReady) return false;
                 return _sendDataWorker.SendData(data);
             }
         }

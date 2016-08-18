@@ -24,6 +24,8 @@ namespace SocketClientServerLib
 
         int HeartbeatInterval { get; set; }
 
+        bool IsSendDataReady { get; }
+
         void EnsureSendDataReady(int timeout);
 
         bool AttachTcpClient(TcpClient tcpClient);
