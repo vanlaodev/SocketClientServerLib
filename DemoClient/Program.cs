@@ -24,7 +24,7 @@ namespace DemoClient
             client.UseSsl = true;
             client.AutoReconnect = true;
             //            client.SendHeartbeat = false;
-            client.ServerCn = "DemoServer";
+            client.ServerCn = "Demo Server";
             client.ClientCertificate = new X509Certificate2("DemoClient.pfx", "green");
             Connect(client);
 

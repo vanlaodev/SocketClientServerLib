@@ -224,6 +224,21 @@ namespace SocketClientServerLib
                 }
                 catch
                 {
+                    try
+                    {
+                        if (_stream != null)
+                        {
+                            _stream.Close();
+                        }
+                        if (_tcpClient != null)
+                        {
+                            _tcpClient.Close();
+                        }
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
                     State = SessionState.Disconnected;
                     throw;
                 }
@@ -239,8 +254,14 @@ namespace SocketClientServerLib
                 State = SessionState.Disconnecting;
                 try
                 {
-                    _stream.Close();
-                    _tcpClient.Close();
+                    if (_stream != null)
+                    {
+                        _stream.Close();
+                    }
+                    if (_tcpClient != null)
+                    {
+                        _tcpClient.Close();
+                    }
                     _sendDataWorker.Stop();
                     _receiveDataWorker.Stop();
                     return true;
