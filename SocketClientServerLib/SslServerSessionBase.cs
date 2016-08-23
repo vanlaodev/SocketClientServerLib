@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -14,6 +16,7 @@ namespace SocketClientServerLib
         private int _authenticateTimeout;
         private X509Certificate2 _serverCertificate;
         private SslProtocols _sslProtocols = SslProtocols.Tls;
+        private readonly List<KeyValuePair<string, string>> _clientSslSubjectKVList = new List<KeyValuePair<string, string>>();
 
         public event Action<ISslServerSessionBase> SslAuthenticated;
 
@@ -57,7 +60,22 @@ namespace SocketClientServerLib
             }
         }
 
-        public string ClientCn { get; private set; }
+        public IEnumerable<KeyValuePair<string, string>> ClientSslSubjectKVList
+        {
+            get
+            {
+                return _clientSslSubjectKVList.ToList();
+            }
+        }
+
+        public string ClientCn
+        {
+            get
+            {
+                var cnKV = _clientSslSubjectKVList.FirstOrDefault(x => x.Key.Equals("CN", StringComparison.InvariantCultureIgnoreCase));
+                return cnKV.Value;
+            }
+        }
 
         protected SslServerSessionBase(IIncomingDataProcessor incomingDataProcessor, IOutgoingDataProcessor outgoingDataProcessor, int receiveBufferSize)
             : base(incomingDataProcessor, outgoingDataProcessor, receiveBufferSize)
@@ -88,7 +106,13 @@ namespace SocketClientServerLib
                 throw new TimeoutException("Ssl authentication timed-out.");
             }
             await authenticateTask;
-            ClientCn = sslStream.RemoteCertificate.Subject.Substring("CN=".Length);
+            _clientSslSubjectKVList.Clear();
+            var arr = sslStream.RemoteCertificate.Subject.Split(",".ToCharArray());
+            foreach (var i in arr)
+            {
+                var keyVal = i.Split("=".ToCharArray());
+                _clientSslSubjectKVList.Add(new KeyValuePair<string, string>(keyVal[0].Trim(), keyVal[1].Trim()));
+            }
             return sslStream;
         }
 
