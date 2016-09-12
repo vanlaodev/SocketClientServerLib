@@ -25,7 +25,7 @@ namespace DemoServer
             server.ClientSslAuthenticated += ServerOnClientSslAuthenticated;
             server.HeartbeatInterval = 5000;
             //            server.SendHeartbeat = false;
-            server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "green");
+            server.ServerCertificate = new X509Certificate2("DemoServer.pfx", "p@ssw0rd");
             server.AddIncomingClientChecker(new GenericIncomingClientChecker("Whitelist", client =>
             {
                 var endPoint = (IPEndPoint)client.Client.RemoteEndPoint;

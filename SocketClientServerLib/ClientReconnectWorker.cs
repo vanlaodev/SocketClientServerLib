@@ -5,6 +5,8 @@ namespace SocketClientServerLib
 {
     internal class ClientReconnectWorker : IDisposable
     {
+        private const int MaxBackOffMultiplexer = 16;
+
         private volatile ClientReconnectWorkerState _state = ClientReconnectWorkerState.Stopped;
         private readonly object _lock = new object();
         private Thread _workerThread;
@@ -54,6 +56,7 @@ namespace SocketClientServerLib
                     State = ClientReconnectWorkerState.Started;
                 }
             }
+            var backOffMultiplexer = 1;
             var workerParameterHolder = (WorkerParameterHolder)obj;
             while (State == ClientReconnectWorkerState.Started)
             {
@@ -61,7 +64,7 @@ namespace SocketClientServerLib
                 {
                     if (State == ClientReconnectWorkerState.Started)
                     {
-                        Monitor.Wait(_workerThread, workerParameterHolder.ReconnectInterval);
+                        Monitor.Wait(_workerThread, workerParameterHolder.ReconnectInterval * backOffMultiplexer);
                     }
                 }
                 try
@@ -71,6 +74,11 @@ namespace SocketClientServerLib
                 catch
                 {
                     // ignored
+                }
+                if (backOffMultiplexer * 2 <= MaxBackOffMultiplexer)
+                {
+                    // back-off
+                    backOffMultiplexer *= 2;
                 }
             }
         }
