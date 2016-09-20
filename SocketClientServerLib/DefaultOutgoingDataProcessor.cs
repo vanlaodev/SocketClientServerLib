@@ -5,14 +5,14 @@ namespace SocketClientServerLib
     public class DefaultOutgoingDataProcessor : IOutgoingDataProcessor
     {
         private const int FixHeaderLength = 7;
-        private int CompressionThreshold = 1024;
-
+        private readonly int _compressionThreshold;
         private readonly byte[] _fixedHeaderBuffer = new byte[FixHeaderLength];
         private readonly CompressionType _compressionType;
 
-        public DefaultOutgoingDataProcessor(byte[] beginning, CompressionType compressionType)
+        public DefaultOutgoingDataProcessor(byte[] beginning, CompressionType compressionType, int compressionThreshold)
         {
             _compressionType = compressionType;
+            _compressionThreshold = compressionThreshold;
 
             _fixedHeaderBuffer[0] = beginning[0];
             _fixedHeaderBuffer[1] = beginning[1];
@@ -26,7 +26,7 @@ namespace SocketClientServerLib
         public byte[] Process(Packet packet)
         {
             var rawData = GetDataBytes(packet);
-            var compressionType = rawData != null && rawData.Length > CompressionThreshold
+            var compressionType = rawData != null && rawData.Length > _compressionThreshold
                 ? _compressionType
                 : CompressionType.None;
             _fixedHeaderBuffer[2] = (byte)compressionType;

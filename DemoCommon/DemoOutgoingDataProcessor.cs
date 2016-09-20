@@ -7,7 +7,8 @@ namespace DemoCommon
 {
     public class DemoOutgoingDataProcessor : VHOutgoingDataProcessorBase
     {
-        public DemoOutgoingDataProcessor(byte[] beginning, CompressionType compressionType) : base(beginning, compressionType)
+        public DemoOutgoingDataProcessor(byte[] beginning, CompressionType compressionType, int compressionThreshold)
+            : base(beginning, compressionType, compressionThreshold)
         {
         }
 

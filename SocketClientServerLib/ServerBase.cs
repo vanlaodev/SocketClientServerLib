@@ -231,15 +231,12 @@ namespace SocketClientServerLib
             {
                 ClientStateChanged(this, (IServerSessionBase)sessionBase, sessionState);
             }
-            if (sessionState == SessionState.Connected)
+
+            if (sessionState == SessionState.Connected && sessionBase.State == sessionState)
             {
-                lock (_lock)
+                lock (_clients)
                 {
-                    if (sessionState != SessionState.Connected) return;
-                    lock (_clients)
-                    {
-                        _clients.Add((IServerSessionBase)sessionBase);
-                    }
+                    _clients.Add((IServerSessionBase)sessionBase);
                 }
             }
             else if (sessionState == SessionState.Disconnected)

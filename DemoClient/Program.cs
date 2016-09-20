@@ -12,7 +12,7 @@ namespace DemoClient
     {
         static void Main(string[] args)
         {
-            IDemoClient client = new DemoClient(new DemoIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DemoOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip), 4096);
+            IDemoClient client = new DemoClient(new DemoIncomingDataProcessor(new byte[] { 0xFF, 0xFF }), new DemoOutgoingDataProcessor(new byte[] { 0xFF, 0xFF }, CompressionType.GZip, 1024), 4096);
             client.ReconnectInterval = 5000;
             client.HeartbeatInterval = 5000;
             client.InternalError += ClientOnInternalError;

@@ -5,7 +5,8 @@ namespace SocketClientServerLib
 {
     public abstract class VHOutgoingDataProcessorBase : DefaultOutgoingDataProcessor
     {
-        protected VHOutgoingDataProcessorBase(byte[] beginning, CompressionType compressionType) : base(beginning, compressionType)
+        protected VHOutgoingDataProcessorBase(byte[] beginning, CompressionType compressionType, int compressionThreshold)
+            : base(beginning, compressionType, compressionThreshold)
         {
         }
 
