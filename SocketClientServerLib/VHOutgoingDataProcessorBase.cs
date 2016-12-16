@@ -15,10 +15,13 @@ namespace SocketClientServerLib
             var vhPacket = packet as VHPacket;
             if (vhPacket == null) return base.GetDataBytes(packet);
             var headersBytes = SerializeHeaders(vhPacket.Headers);
-            var dataBytes = new byte[4 + headersBytes.Length + packet.Data.Length];
+            var dataBytes = new byte[4 + headersBytes.Length + (packet.Data == null ? 0 : packet.Data.Length)];
             ConversionUtil.ToBytes(dataBytes, 0, 4, headersBytes.Length);
             Array.Copy(headersBytes, 0, dataBytes, 4, headersBytes.Length);
-            Array.Copy(packet.Data, 0, dataBytes, 4 + headersBytes.Length, packet.Data.Length);
+            if (packet.Data != null && packet.Data.Length > 0)
+            {
+                Array.Copy(packet.Data, 0, dataBytes, 4 + headersBytes.Length, packet.Data.Length);
+            }
             return dataBytes;
         }
 
