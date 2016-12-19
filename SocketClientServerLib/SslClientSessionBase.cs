@@ -93,7 +93,7 @@ namespace SocketClientServerLib
         {
             var authenticateTask = sslStream.AuthenticateAsClientAsync(ServerCn,
                 new X509Certificate2Collection(ClientCertificate), SslProtocols, false);
-            if (await Task.WhenAny(authenticateTask, Task.Delay(AuthenticateTimeout)) != authenticateTask)
+            if (await Task.WhenAny(authenticateTask, Task.Delay(AuthenticateTimeout)).ConfigureAwait(false) != authenticateTask)
             {
                 throw new TimeoutException("Ssl authentication timed-out.");
             }
