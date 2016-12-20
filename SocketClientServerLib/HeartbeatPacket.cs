@@ -14,13 +14,12 @@ namespace SocketClientServerLib
             get { return null; }
             set
             {
-                throw new InvalidOperationException();
             }
         }
 
         public override object Clone()
         {
-            throw new NotSupportedException();
+            return new HeartbeatPacket();
         }
     }
 }

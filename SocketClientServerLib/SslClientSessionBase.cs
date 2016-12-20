@@ -58,7 +58,7 @@ namespace SocketClientServerLib
             get { return _clientCertificate; }
             set
             {
-                if (State != SessionState.Disconnected && State != SessionState.Disconnecting) throw new InvalidOperationException();
+                if (State != SessionState.Disconnected && State != SessionState.Disconnecting) throw new InvalidOperationException("Invalid session state.");
                 _clientCertificate = value;
             }
         }
